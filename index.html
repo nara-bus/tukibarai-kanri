@@ -286,6 +286,122 @@
   .empty-icon { font-size: 40px; margin-bottom: 10px; }
   .empty-text { font-size: 14px; }
 
+  /* RATIO TOGGLE */
+  .ratio-toggle-row { display: flex; gap: 8px; width: fit-content; }
+  .ratio-toggle {
+    padding: 10px 28px;
+    border: none;
+    border-radius: 8px;
+    background: #e4eaf0;
+    color: var(--text-sub);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 0.04em;
+    box-shadow: 0 3px 0 #b0bec8, 0 4px 8px rgba(0,0,0,0.10);
+    transform: translateY(0);
+    transition: background 0.15s, color 0.15s, box-shadow 0.1s, transform 0.1s;
+  }
+  .ratio-toggle:active {
+    box-shadow: 0 1px 0 #b0bec8;
+    transform: translateY(2px);
+  }
+  .ratio-toggle.active {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 3px 0 #0d2230, 0 4px 10px rgba(26,58,74,0.28);
+  }
+  .ratio-toggle.active:active {
+    box-shadow: 0 1px 0 #0d2230;
+    transform: translateY(2px);
+  }
+
+  /* TENKEY */
+  .tenkey-display {
+    background: var(--primary);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 0;
+    letter-spacing: 0.04em;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  .tenkey-modal-inner {
+    background: #fff;
+    border-radius: 16px 16px 0 0;
+    padding: 16px 16px 28px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.18);
+    animation: slideUp 0.22s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .tenkey-modal-display {
+    background: var(--primary);
+    color: #fff;
+    font-size: 26px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    letter-spacing: 0.04em;
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  /* テンキーモーダルは画面下から */
+  #tenkey-modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .tenkey-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+  }
+  .tkey {
+    background: #e8eef4;
+    color: var(--text);
+    border: none;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: 700;
+    font-family: inherit;
+    padding: 12px 0;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #b0bec8, 0 5px 8px rgba(0,0,0,0.10);
+    transform: translateY(0);
+    transition: box-shadow 0.08s, transform 0.08s, background 0.1s;
+    user-select: none;
+  }
+  .tkey:active {
+    box-shadow: 0 1px 0 #b0bec8;
+    transform: translateY(3px);
+    background: #d4dde6;
+  }
+  .tkey-wide { grid-column: span 2; }
+  .tkey-del {
+    background: #f0e0e0;
+    color: var(--danger);
+    box-shadow: 0 4px 0 #d0a0a0, 0 5px 8px rgba(0,0,0,0.10);
+  }
+  .tkey-del:active {
+    box-shadow: 0 1px 0 #d0a0a0;
+    transform: translateY(3px);
+    background: #e4c8c8;
+  }
+
   /* RATIO SETTING */
   .ratio-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
   .ratio-row input { flex: 1; }
@@ -320,9 +436,13 @@
             <label>月日</label>
             <input type="date" id="in-date">
           </div>
-          <div>
+          <div class="form-full">
             <label>金額（円）</label>
-            <input type="number" id="in-amount" placeholder="0" min="0">
+            <div class="tenkey-display" id="tenkey-display" onclick="openTenkey()" style="cursor:pointer">
+              <span id="tenkey-display-text">タップして入力</span>
+              <span style="font-size:13px;opacity:0.6;margin-left:8px">▼</span>
+            </div>
+            <input type="hidden" id="in-amount" value="0">
           </div>
           <div class="form-full">
             <label>支払先</label>
@@ -336,6 +456,13 @@
           <div class="form-full">
             <label>備考</label>
             <input type="text" id="in-note" placeholder="例：2/6引落">
+          </div>
+          <div class="form-full">
+            <label>請求分</label>
+            <div class="ratio-toggle-row">
+              <button class="ratio-toggle active" id="in-ratio-50" onclick="setInputRatio(50)">50%</button>
+              <button class="ratio-toggle" id="in-ratio-100" onclick="setInputRatio(100)">100%</button>
+            </div>
           </div>
         </div>
         <div class="btn-row">
@@ -379,6 +506,7 @@
                 <th>支払先</th>
                 <th>用途</th>
                 <th style="text-align:right">金額</th>
+                <th>請求</th>
                 <th>備考</th>
                 <th class="no-print">操作</th>
               </tr>
@@ -446,6 +574,13 @@
           <div>
             <label>備考</label>
             <input type="text" id="sp-note" placeholder="例：銀行引落">
+          </div>
+          <div class="form-full">
+            <label>請求分</label>
+            <div class="ratio-toggle-row">
+              <button class="ratio-toggle active" id="sp-ratio-50" onclick="setSpRatio(50)">50%</button>
+              <button class="ratio-toggle" id="sp-ratio-100" onclick="setSpRatio(100)">100%</button>
+            </div>
           </div>
         </div>
         <div class="btn-row">
@@ -533,7 +668,78 @@
   </button>
 </div>
 
+<!-- TENKEY MODAL -->
+<div class="modal-overlay" id="tenkey-modal">
+  <div class="tenkey-modal-inner">
+    <div class="tenkey-modal-display" id="tenkey-modal-display">0</div>
+    <div class="tenkey-grid">
+      <button class="tkey" onclick="tkInput('7')">7</button>
+      <button class="tkey" onclick="tkInput('8')">8</button>
+      <button class="tkey" onclick="tkInput('9')">9</button>
+      <button class="tkey" onclick="tkInput('4')">4</button>
+      <button class="tkey" onclick="tkInput('5')">5</button>
+      <button class="tkey" onclick="tkInput('6')">6</button>
+      <button class="tkey" onclick="tkInput('1')">1</button>
+      <button class="tkey" onclick="tkInput('2')">2</button>
+      <button class="tkey" onclick="tkInput('3')">3</button>
+      <button class="tkey tkey-wide" onclick="tkInput('0')">0</button>
+      <button class="tkey tkey-del" onclick="tkDel()">⌫</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <button class="btn btn-outline" style="flex:1" onclick="closeTenkey()">キャンセル</button>
+      <button class="btn btn-primary" style="flex:2" onclick="confirmTenkey()">決定</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: 編集 -->
+<!-- PERIODIC EDIT MODAL -->
+<div class="modal-overlay" id="periodic-edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">定期支払いを編集</span>
+      <button class="modal-close" onclick="closePeriodicEditModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pedit-id">
+      <div class="form-grid">
+        <div class="form-full"><label>支払先</label><input type="text" id="pedit-payee"></div>
+        <div class="form-full"><label>用途</label><input type="text" id="pedit-purpose"></div>
+        <div><label>金額（円）</label><input type="number" id="pedit-amount"></div>
+        <div><label>頻度</label>
+          <select id="pedit-freq">
+            <option value="monthly">毎月</option>
+            <option value="bimonthly">隔月</option>
+            <option value="quarterly">3ヶ月ごと</option>
+            <option value="yearly">年1回</option>
+            <option value="semi-yearly">半年ごと</option>
+          </select>
+        </div>
+        <div><label>支払月（開始月）</label>
+          <select id="pedit-month">
+            <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+            <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+            <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+            <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+          </select>
+        </div>
+        <div><label>備考</label><input type="text" id="pedit-note"></div>
+        <div class="form-full">
+          <label>請求分</label>
+          <div class="ratio-toggle-row">
+            <button class="ratio-toggle active" id="pedit-ratio-50" onclick="setPeditRatio(50)">50%</button>
+            <button class="ratio-toggle" id="pedit-ratio-100" onclick="setPeditRatio(100)">100%</button>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-block" onclick="savePeriodicEdit()">保存する</button>
+        <button class="btn btn-danger" onclick="deletePeriodicFromModal()">削除</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
     <div class="modal-header">
@@ -562,6 +768,13 @@
         <div class="form-full">
           <label>備考</label>
           <input type="text" id="edit-note">
+        </div>
+        <div class="form-full">
+          <label>請求分</label>
+          <div class="ratio-toggle-row">
+            <button class="ratio-toggle active" id="edit-ratio-50" onclick="setEditRatio(50)">50%</button>
+            <button class="ratio-toggle" id="edit-ratio-100" onclick="setEditRatio(100)">100%</button>
+          </div>
         </div>
       </div>
       <div class="btn-row">
@@ -682,11 +895,59 @@ let currentTab = 'input';
 let reportYear = new Date().getFullYear();
 let reportMonth = new Date().getMonth() + 1;
 let selectedYear = new Date().getFullYear();
+let currentInputRatio = 50;
+let currentSpRatio = 50;
+let currentPeditRatio = 50;
+let currentEditRatio = 50;
+
+function setInputRatio(pct) {
+  currentInputRatio = pct;
+  document.getElementById('in-ratio-50').classList.toggle('active', pct === 50);
+  document.getElementById('in-ratio-100').classList.toggle('active', pct === 100);
+}
+function setSpRatio(pct) {
+  currentSpRatio = pct;
+  document.getElementById('sp-ratio-50').classList.toggle('active', pct === 50);
+  document.getElementById('sp-ratio-100').classList.toggle('active', pct === 100);
+}
+function setPeditRatio(pct) {
+  currentPeditRatio = pct;
+  document.getElementById('pedit-ratio-50').classList.toggle('active', pct === 50);
+  document.getElementById('pedit-ratio-100').classList.toggle('active', pct === 100);
+}
+function setEditRatio(pct) {
+  currentEditRatio = pct;
+  document.getElementById('edit-ratio-50').classList.toggle('active', pct === 50);
+  document.getElementById('edit-ratio-100').classList.toggle('active', pct === 100);
+}
 
 // ============================================================
 // HELPERS
 // ============================================================
 function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+// TENKEY
+let _tkVal = '0';
+function tkInput(d) {
+  if (_tkVal === '0') _tkVal = d;
+  else _tkVal += d;
+  if (_tkVal.length > 9) _tkVal = _tkVal.slice(0, 9);
+  _tkSync();
+}
+function tkDel() {
+  _tkVal = _tkVal.slice(0, -1) || '0';
+  _tkSync();
+}
+function tkReset() {
+  _tkVal = '0';
+  _tkSync();
+}
+function _tkSync() {
+  const num = parseInt(_tkVal, 10) || 0;
+  document.getElementById('in-amount').value = num;
+  const disp = document.getElementById('tenkey-display');
+  if (disp) disp.textContent = num === 0 ? '0' : num.toLocaleString('ja-JP') + ' 円';
+}
 function fmt(n) {
   if (n === null || n === undefined || n === '') return '―';
   const num = Number(n);
@@ -762,6 +1023,7 @@ function switchTab(tab) {
 function initInputDate() {
   const today = new Date();
   document.getElementById('in-date').value = today.toISOString().slice(0, 10);
+  document.getElementById('in-date').addEventListener('change', renderPeriodicSuggestion);
 }
 function renderInputTab() {
   updatePayeeDatalist();
@@ -794,12 +1056,23 @@ function renderQuickSummary() {
   `;
 }
 function renderPeriodicSuggestion() {
-  const y = new Date().getFullYear(), m = new Date().getMonth() + 1;
+  // 入力欄の日付から年月を取得、未入力なら今月
+  const dateVal = document.getElementById('in-date').value;
+  let y, m;
+  if (dateVal) {
+    const d = new Date(dateVal);
+    y = d.getFullYear(); m = d.getMonth() + 1;
+  } else {
+    y = new Date().getFullYear(); m = new Date().getMonth() + 1;
+  }
   const due = periodics.filter(p => isPeriodicDue(p, y, m));
   const el = document.getElementById('periodic-suggestion');
   const body = document.getElementById('periodic-suggestion-body');
   if (due.length === 0) { el.style.display = 'none'; return; }
   el.style.display = '';
+  // カードヘッダーの月表示を更新
+  const hdr = el.querySelector('.card-header');
+  if (hdr) hdr.textContent = `🔄 ${y}年${m}月の定期支払い`;
   body.innerHTML = due.map(p => `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
       <div>
@@ -808,7 +1081,7 @@ function renderPeriodicSuggestion() {
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-weight:700;color:var(--primary)">${p.amount ? fmt(p.amount) : '金額未設定'}</span>
-        <button class="btn btn-accent btn-sm" onclick="addPeriodicEntry('${p.id}')">追加</button>
+        <button class="btn btn-accent btn-sm" onclick="addPeriodicEntry('${p.id}','${dateVal}')">追加</button>
       </div>
     </div>
   `).join('');
@@ -819,23 +1092,24 @@ function addEntry() {
   const payee = document.getElementById('in-payee').value.trim();
   const purpose = document.getElementById('in-purpose').value.trim();
   const note = document.getElementById('in-note').value.trim();
+  const ratio_pct = currentInputRatio;
   if (!date) { showToast('⚠ 日付を入力してください'); return; }
   if (!payee) { showToast('⚠ 支払先を入力してください'); return; }
-  entries.push({ id: genId(), date, amount: Number(amount) || 0, payee, purpose, note });
+  entries.push({ id: genId(), date, amount: Number(amount) || 0, payee, purpose, note, ratio_pct });
   save(STORAGE_KEYS.entries, entries);
-  // reset amount/payee/purpose/note
   document.getElementById('in-amount').value = '';
+  tkReset();
   document.getElementById('in-payee').value = '';
   document.getElementById('in-purpose').value = '';
   document.getElementById('in-note').value = '';
   showToast('✓ 追加しました');
   renderInputTab();
 }
-function addPeriodicEntry(pid) {
+function addPeriodicEntry(pid, dateVal) {
   const p = periodics.find(x => x.id === pid);
   if (!p) return;
-  const today = new Date().toISOString().slice(0, 10);
-  entries.push({ id: genId(), date: today, amount: p.amount, payee: p.payee, purpose: p.purpose, note: p.note });
+  const date = dateVal || new Date().toISOString().slice(0, 10);
+  entries.push({ id: genId(), date, amount: p.amount, payee: p.payee, purpose: p.purpose, note: p.note, ratio_pct: p.ratio_pct || 50 });
   save(STORAGE_KEYS.entries, entries);
   showToast(`✓ ${p.payee}を追加しました`);
   renderInputTab();
@@ -852,38 +1126,64 @@ function renderReport() {
   const tbody = document.getElementById('report-tbody');
 
   if (list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">この月の支払いはありません</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">この月の支払いはありません</div></div></td></tr>`;
   } else {
-    tbody.innerHTML = list.map(e => `
+    tbody.innerHTML = list.map(e => {
+      const pct = e.ratio_pct || 50;
+      const badge = pct === 100
+        ? `<span style="background:#fff0d0;color:#aa6a00;border-radius:10px;font-size:10px;padding:1px 6px;font-weight:700;margin-left:4px">100%</span>`
+        : `<span style="background:#e0f0ff;color:#1a6aaa;border-radius:10px;font-size:10px;padding:1px 6px;font-weight:700;margin-left:4px">50%</span>`;
+      return `
       <tr>
         <td class="td-date">${fmtDate(e.date)}</td>
         <td class="td-payee">${e.payee}</td>
         <td style="font-size:12px">${e.purpose || ''}</td>
         <td class="amount ${Number(e.amount) < 0 ? 'negative' : ''}">${fmt(e.amount)}</td>
+        <td>${badge}</td>
         <td class="td-note">${e.note || ''}</td>
         <td class="td-actions no-print">
           <button class="icon-btn" onclick="openEditModal('${e.id}')">✏️</button>
         </td>
-      </tr>
-    `).join('');
+      </tr>`;
+    }).join('');
   }
 
+  // 集計：50%グループと100%グループに分けて計算
   const total = list.reduce((s, e) => s + Number(e.amount || 0), 0);
-  const half = Math.round(total * ratio);
+  const amt50 = list.filter(e => (e.ratio_pct || 50) === 50).reduce((s, e) => s + Number(e.amount || 0), 0);
+  const amt100 = list.filter(e => (e.ratio_pct || 50) === 100).reduce((s, e) => s + Number(e.amount || 0), 0);
+  const billing = Math.round(amt50 * 0.5) + amt100;
+
   document.getElementById('report-summary').innerHTML = `
     <div class="summary-row">
       <span class="summary-label">件数</span>
       <span class="summary-value">${list.length}件</span>
     </div>
     <div class="summary-row">
-      <span class="summary-label">小計</span>
-      <span class="summary-value">${fmt(total)}</span>
+      <span class="summary-label">小計（全体）</span>
+      <span class="summary-value summary-total">${fmt(total)}</span>
+    </div>
+    <div style="margin:8px 0 4px;font-size:11px;color:var(--text-sub);font-weight:700;letter-spacing:.04em">── 内訳 ──</div>
+    <div class="summary-row">
+      <span class="summary-label">　50%対象 小計</span>
+      <span class="summary-value">${fmt(amt50)}</span>
     </div>
     <div class="summary-row">
-      <span class="summary-label">請求分（50%）</span>
-      <span class="summary-value summary-half">${fmt(half)}</span>
+      <span class="summary-label">　50%請求分</span>
+      <span class="summary-value" style="color:var(--accent2)">${fmt(Math.round(amt50 * 0.5))}</span>
     </div>
-    <div class="ratio-info">※ 請求割合は設定タブで変更できます</div>
+    <div class="summary-row">
+      <span class="summary-label">　100%対象 小計</span>
+      <span class="summary-value">${fmt(amt100)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">　100%請求分</span>
+      <span class="summary-value" style="color:var(--accent2)">${fmt(amt100)}</span>
+    </div>
+    <div style="border-top:2px solid var(--primary);margin-top:8px;padding-top:8px" class="summary-row">
+      <span class="summary-label" style="font-weight:700;color:var(--primary)">請求合計</span>
+      <span class="summary-value summary-total" style="font-size:17px">${fmt(billing)}</span>
+    </div>
   `;
 }
 function changeReportMonth(dir) {
@@ -905,6 +1205,10 @@ function openEditModal(id) {
   document.getElementById('edit-payee').value = e.payee;
   document.getElementById('edit-purpose').value = e.purpose || '';
   document.getElementById('edit-note').value = e.note || '';
+  const pct = e.ratio_pct || 50;
+  document.getElementById('edit-ratio-50').classList.toggle('active', pct === 50);
+  document.getElementById('edit-ratio-100').classList.toggle('active', pct === 100);
+  currentEditRatio = pct;
   document.getElementById('edit-modal').classList.add('open');
 }
 function closeEditModal() {
@@ -920,7 +1224,8 @@ function saveEdit() {
     amount: Number(document.getElementById('edit-amount').value) || 0,
     payee: document.getElementById('edit-payee').value.trim(),
     purpose: document.getElementById('edit-purpose').value.trim(),
-    note: document.getElementById('edit-note').value.trim()
+    note: document.getElementById('edit-note').value.trim(),
+    ratio_pct: currentEditRatio
   };
   save(STORAGE_KEYS.entries, entries);
   closeEditModal();
@@ -952,16 +1257,22 @@ function renderSettings() {
     el.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">定期支払いが未登録です</div></div>';
     return;
   }
-  el.innerHTML = periodics.map(p => `
+  el.innerHTML = periodics.map(p => {
+    const pct = p.ratio_pct || 50;
+    const badge = pct === 100
+      ? `<span style="background:#fff0d0;color:#aa6a00;border-radius:10px;font-size:10px;padding:1px 6px;font-weight:700">100%</span>`
+      : `<span style="background:#e0f0ff;color:#1a6aaa;border-radius:10px;font-size:10px;padding:1px 6px;font-weight:700">50%</span>`;
+    return `
     <div class="setting-item">
       <div class="setting-info">
-        <div class="setting-name">${p.payee} ${freqTag(p.freq)}</div>
+        <div class="setting-name">${p.payee} ${freqTag(p.freq)} ${badge}</div>
         <div class="setting-sub">${p.purpose}　支払月：${p.month}月〜　${p.note ? '/ ' + p.note : ''}</div>
       </div>
       <span class="setting-amount">${p.amount ? fmt(p.amount) : '―'}</span>
-      <button class="icon-btn" onclick="deletePeriodic('${p.id}')" style="margin-left:6px">🗑</button>
-    </div>
-  `).join('');
+      <button class="icon-btn" onclick="openPeriodicEditModal('${p.id}')" style="margin-left:4px" title="編集">✏️</button>
+      <button class="icon-btn" onclick="deletePeriodic('${p.id}')" style="margin-left:2px" title="削除">🗑</button>
+    </div>`;
+  }).join('');
 }
 function saveRatio() {
   const v = parseFloat(document.getElementById('ratio-input').value);
@@ -978,14 +1289,63 @@ function addPeriodic() {
   const freq = document.getElementById('sp-freq').value;
   const month = Number(document.getElementById('sp-month').value);
   const note = document.getElementById('sp-note').value.trim();
+  const ratio_pct = currentSpRatio;
   if (!payee) { showToast('⚠ 支払先を入力してください'); return; }
-  periodics.push({ id: genId(), payee, purpose, amount, freq, month, note });
+  periodics.push({ id: genId(), payee, purpose, amount, freq, month, note, ratio_pct });
   save(STORAGE_KEYS.periodic, periodics);
   document.getElementById('sp-payee').value = '';
   document.getElementById('sp-purpose').value = '';
   document.getElementById('sp-amount').value = '';
   document.getElementById('sp-note').value = '';
   showToast('✓ 定期支払いを登録しました');
+  renderSettings();
+}
+function openPeriodicEditModal(id) {
+  const p = periodics.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('pedit-id').value = p.id;
+  document.getElementById('pedit-payee').value = p.payee;
+  document.getElementById('pedit-purpose').value = p.purpose || '';
+  document.getElementById('pedit-amount').value = p.amount || '';
+  document.getElementById('pedit-freq').value = p.freq;
+  document.getElementById('pedit-month').value = p.month;
+  document.getElementById('pedit-note').value = p.note || '';
+  // 請求分ボタン
+  const pct = p.ratio_pct || 50;
+  document.getElementById('pedit-ratio-50').classList.toggle('active', pct === 50);
+  document.getElementById('pedit-ratio-100').classList.toggle('active', pct === 100);
+  currentPeditRatio = pct;
+  document.getElementById('periodic-edit-modal').classList.add('open');
+}
+function closePeriodicEditModal() {
+  document.getElementById('periodic-edit-modal').classList.remove('open');
+}
+function savePeriodicEdit() {
+  const id = document.getElementById('pedit-id').value;
+  const idx = periodics.findIndex(x => x.id === id);
+  if (idx < 0) return;
+  periodics[idx] = {
+    id,
+    payee: document.getElementById('pedit-payee').value.trim(),
+    purpose: document.getElementById('pedit-purpose').value.trim(),
+    amount: Number(document.getElementById('pedit-amount').value) || 0,
+    freq: document.getElementById('pedit-freq').value,
+    month: Number(document.getElementById('pedit-month').value),
+    note: document.getElementById('pedit-note').value.trim(),
+    ratio_pct: currentPeditRatio
+  };
+  save(STORAGE_KEYS.periodic, periodics);
+  closePeriodicEditModal();
+  showToast('✓ 定期支払いを更新しました');
+  renderSettings();
+}
+function deletePeriodicFromModal() {
+  const id = document.getElementById('pedit-id').value;
+  if (!confirm('この定期支払いを削除しますか？')) return;
+  periodics = periodics.filter(p => p.id !== id);
+  save(STORAGE_KEYS.periodic, periodics);
+  closePeriodicEditModal();
+  showToast('🗑 削除しました');
   renderSettings();
 }
 function deletePeriodic(id) {
@@ -1085,6 +1445,9 @@ window.addEventListener('DOMContentLoaded', () => {
   // Close modal on overlay click
   document.getElementById('edit-modal').addEventListener('click', function(e) {
     if (e.target === this) closeEditModal();
+  });
+  document.getElementById('periodic-edit-modal').addEventListener('click', function(e) {
+    if (e.target === this) closePeriodicEditModal();
   });
 });
 </script>

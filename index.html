@@ -509,7 +509,7 @@ tr:last-child td{border-bottom:none}
 <!-- TENKEY MODAL -->
 <div id="tenkey-modal">
   <div class="tenkey-sheet">
-    <div class="tenkey-title">番号を入力</div>
+    <div class="tenkey-title">金額を入力</div>
     <div class="tenkey-disp" id="tenkey-disp">0</div>
     <div class="tkey-grid">
       <button class="tkey" onclick="tkInput('7')">7</button>
@@ -598,7 +598,10 @@ tr:last-child td{border-bottom:none}
         <div><label>月日</label><input type="date" id="edit-date"></div>
         <div>
           <label>金額（円）</label>
-          <input type="number" id="edit-amount" placeholder="0">
+          <div class="amount-input-display" id="edit-amount-display" onclick="openTenkey('edit')">
+            <span id="edit-amount-display-text" class="placeholder">タップして入力</span>
+          </div>
+          <input type="hidden" id="edit-amount">
         </div>
         <div class="form-full"><label>支払先</label><input type="text" id="edit-payee"></div>
         <div class="form-full"><label>用途</label><input type="text" id="edit-purpose"></div>
@@ -620,7 +623,7 @@ tr:last-child td{border-bottom:none}
 </div>
 
 <!-- ファイル読込用 -->
-<input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
+<input type="file" id="import-file" accept=".json,application/json" style="display:none" onchange="handleImport(event)">
 <div id="toast"></div>
 
 <!-- 保存モーダル -->
@@ -739,13 +742,13 @@ let currentInputRatio=50,currentSpRatio=50,currentPeditRatio=50,currentEditRatio
 
 // ── TENKEY STATE ──
 let _tkVal='0';
-let _tkTarget='main'; // 'main' | 'sp' | 'pedit'
+let _tkTarget='main'; // 'main' | 'sp' | 'pedit' | 'edit'
 
 function openTenkey(target){
   _tkTarget=target;
-  // 現在値を読み込む
   const cur=target==='main'?document.getElementById('in-amount').value
             :target==='sp'?document.getElementById('sp-amount').value
+            :target==='edit'?document.getElementById('edit-amount').value
             :document.getElementById('pedit-amount').value;
   _tkVal=(cur&&cur!=='0'&&cur!=='')?String(parseInt(cur)):'0';
   _tkRefresh();
@@ -782,6 +785,12 @@ function confirmTenkey(){
     const el=document.getElementById('pedit-amount-display-text');
     el.textContent=disp||'タップして入力';
     el.classList.toggle('placeholder',!disp);
+  }else if(_tkTarget==='edit'){
+    document.getElementById('edit-amount').value=num||'';
+    const el=document.getElementById('edit-amount-display-text');
+    el.textContent=disp||'タップして入力';
+    el.classList.toggle('placeholder',!disp);
+    document.getElementById('edit-amount-display').style.color=disp?'var(--text)':'';
   }
   _tkVal='0';
   closeTenkey();
@@ -979,6 +988,10 @@ function openEditModal(id){
   document.getElementById('edit-id').value=e.id;
   document.getElementById('edit-date').value=e.date;
   document.getElementById('edit-amount').value=e.amount;
+  const amtDisp=e.amount?`${Number(e.amount).toLocaleString('ja-JP')} 円`:'';
+  const dispEl=document.getElementById('edit-amount-display-text');
+  dispEl.textContent=amtDisp||'タップして入力';
+  dispEl.classList.toggle('placeholder',!amtDisp);
   document.getElementById('edit-payee').value=e.payee;
   document.getElementById('edit-purpose').value=e.purpose||'';
   document.getElementById('edit-note').value=e.note||'';
@@ -1147,7 +1160,8 @@ function importData(){
 function closeLoadModal(){document.getElementById('load-modal').classList.remove('open')}
 function doImport(){
   closeLoadModal();
-  document.getElementById('import-file').click();
+  // モーダル閉じ後にファイルダイアログを開く（即時だとブラウザにブロックされる場合あり）
+  setTimeout(()=>document.getElementById('import-file').click(), 150);
 }
 function handleImport(e){
   const file=e.target.files[0];if(!file)return;
@@ -1174,7 +1188,7 @@ function handleImport(e){
     e.target.value='';
   };
   reader.onerror=()=>{showToast('⚠ ファイルの読み込みに失敗しました');e.target.value='';};
-  reader.readAsText(file);
+  reader.readAsText(file,'UTF-8');
 }
 
 // ── PWA SERVICE WORKER ──

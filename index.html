@@ -624,54 +624,52 @@ tr:last-child td{border-bottom:none}
 <input type="file" id="import-file" accept=".json,application/json" style="display:none" onchange="handleImport(event)">
 
 <!-- 支払い追加フォームモーダル -->
-<div id="add-form-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center">
-  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:0 0 24px;animation:slideUp .22s ease">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:1">
+<div id="add-form-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.5);align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:20px;padding:20px 16px 16px;width:calc(100% - 40px);max-width:360px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.28);animation:fadeScaleIn .18s ease">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <span style="font-size:15px;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:6px">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M12 5v14M5 12h14"/></svg>
         支払いを追加
       </span>
       <button onclick="closeAddForm()" style="background:none;border:none;font-size:22px;color:var(--text-sub);cursor:pointer;padding:0 4px;line-height:1">×</button>
     </div>
-    <div style="padding:14px 18px 0">
-      <div class="form-grid">
-        <div class="form-full">
-          <label>月日</label>
-          <input type="date" id="in-date">
+    <div class="form-grid">
+      <div class="form-full">
+        <label>月日</label>
+        <input type="date" id="in-date">
+      </div>
+      <div class="form-full">
+        <label>金額（円）</label>
+        <div class="amount-input-display" id="amount-display" onclick="openTenkey('main')">
+          <span class="placeholder" id="amount-display-text">タップして入力</span>
+          <span style="font-size:13px;color:#aab">▼</span>
         </div>
-        <div>
-          <label>金額（円）</label>
-          <div class="amount-input-display" id="amount-display" onclick="openTenkey('main')">
-            <span class="placeholder" id="amount-display-text">タップして入力</span>
-            <span style="font-size:13px;color:#aab">▼</span>
-          </div>
-          <input type="hidden" id="in-amount" value="">
-        </div>
-        <div class="form-full">
-          <label>支払先</label>
-          <input type="text" id="in-payee" placeholder="例：関西電力" list="payee-list">
-          <datalist id="payee-list"></datalist>
-        </div>
-        <div class="form-full">
-          <label>用途</label>
-          <input type="text" id="in-purpose" placeholder="例：電気代 1月分">
-        </div>
-        <div class="form-full">
-          <label>備考</label>
-          <input type="text" id="in-note" placeholder="例：2/6引落">
-        </div>
-        <div class="form-full">
-          <label>請求分</label>
-          <div class="ratio-toggle-row">
-            <button class="ratio-toggle active" id="in-ratio-50" onclick="setInputRatio(50)">50%</button>
-            <button class="ratio-toggle" id="in-ratio-100" onclick="setInputRatio(100)">100%</button>
-          </div>
+        <input type="hidden" id="in-amount" value="">
+      </div>
+      <div class="form-full">
+        <label>支払先</label>
+        <input type="text" id="in-payee" placeholder="例：関西電力" list="payee-list">
+        <datalist id="payee-list"></datalist>
+      </div>
+      <div class="form-full">
+        <label>用途</label>
+        <input type="text" id="in-purpose" placeholder="例：電気代 1月分">
+      </div>
+      <div class="form-full">
+        <label>備考</label>
+        <input type="text" id="in-note" placeholder="例：2/6引落">
+      </div>
+      <div class="form-full">
+        <label>請求分</label>
+        <div class="ratio-toggle-row">
+          <button class="ratio-toggle active" id="in-ratio-50" onclick="setInputRatio(50)">50%</button>
+          <button class="ratio-toggle" id="in-ratio-100" onclick="setInputRatio(100)">100%</button>
         </div>
       </div>
-      <div class="tkey-action-row" style="margin-top:14px">
-        <button class="tkey-cancel" onclick="closeAddForm()">キャンセル</button>
-        <button class="tkey-ok" onclick="addEntry()">追加する</button>
-      </div>
+    </div>
+    <div class="tkey-action-row" style="margin-top:14px">
+      <button class="tkey-cancel" onclick="closeAddForm()">キャンセル</button>
+      <button class="tkey-ok" onclick="addEntry()">追加する</button>
     </div>
   </div>
 </div>
@@ -813,9 +811,20 @@ function openTenkey(target){
             :document.getElementById('pedit-amount').value;
   _tkVal=(cur&&cur!=='0'&&cur!=='')?String(parseInt(cur)):'0';
   _tkRefresh();
+  if(target==='main'){
+    document.getElementById('add-form-modal').style.display='none';
+  }
   document.getElementById('tenkey-modal').classList.add('open');
 }
-function closeTenkey(){document.getElementById('tenkey-modal').classList.remove('open')}
+function _restoreAddForm(){
+  if(_tkTarget==='main'){
+    document.getElementById('add-form-modal').style.display='flex';
+  }
+}
+function closeTenkey(){
+  document.getElementById('tenkey-modal').classList.remove('open');
+  _restoreAddForm();
+}
 function tkInput(d){
   if(_tkVal==='0')_tkVal=d;else _tkVal+=d;
   if(_tkVal.length>9)_tkVal=_tkVal.slice(0,9);

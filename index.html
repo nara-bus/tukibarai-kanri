@@ -306,6 +306,17 @@ tr:last-child td{border-bottom:none}
 .empty-icon{font-size:36px;margin-bottom:8px}
 .empty-text{font-size:13px}
 
+/* ── ADD ENTRY BUTTON ── */
+.add-entry-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:16px;margin-bottom:12px;
+  background:var(--primary);color:#fff;border:none;border-radius:14px;
+  font-size:16px;font-weight:700;font-family:inherit;
+  cursor:pointer;box-shadow:0 4px 0 #0d2230;
+  transform:translateY(0);transition:box-shadow .08s,transform .08s;
+}
+.add-entry-btn:active{box-shadow:0 1px 0 #0d2230;transform:translateY(3px)}
+
 /* ── PRINT ── */
 @media print{
   #app-header,#tab-bar,#tenkey-modal,.modal-overlay,.no-print{display:none!important}
@@ -347,54 +358,11 @@ tr:last-child td{border-bottom:none}
 
   <!-- TAB: 入力 -->
   <div id="tab-input" class="tab-content active">
-    <div class="card">
-      <div class="card-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 5v14M5 12h14"/></svg>
-        支払いを追加
-      </div>
-      <div class="card-body">
-        <div class="form-grid">
-          <div class="form-full">
-            <label>月日</label>
-            <input type="date" id="in-date">
-          </div>
-          <div>
-            <label>金額（円）</label>
-            <div class="amount-input-display" id="amount-display" onclick="openTenkey('main')">
-              <span class="placeholder" id="amount-display-text">タップして入力</span>
-              <span style="font-size:13px;color:#aab">▼</span>
-            </div>
-            <input type="hidden" id="in-amount" value="">
-          </div>
-          <div class="form-full">
-            <label>支払先</label>
-            <input type="text" id="in-payee" placeholder="例：関西電力" list="payee-list">
-            <datalist id="payee-list"></datalist>
-          </div>
-          <div class="form-full">
-            <label>用途</label>
-            <input type="text" id="in-purpose" placeholder="例：電気代 1月分">
-          </div>
-          <div class="form-full">
-            <label>備考</label>
-            <input type="text" id="in-note" placeholder="例：2/6引落">
-          </div>
-          <div class="form-full">
-            <label>請求分</label>
-            <div class="ratio-toggle-row">
-              <button class="ratio-toggle active" id="in-ratio-50" onclick="setInputRatio(50)">50%</button>
-              <button class="ratio-toggle" id="in-ratio-100" onclick="setInputRatio(100)">100%</button>
-            </div>
-          </div>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-primary btn-block" onclick="addEntry()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><path d="M12 5v14M5 12h14"/></svg>
-            追加する
-          </button>
-        </div>
-      </div>
-    </div>
+
+    <button class="add-entry-btn" onclick="openAddForm()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M12 5v14M5 12h14"/></svg>
+      支払いを追加
+    </button>
 
     <div class="card">
       <div class="card-header" id="quick-summary-header">📊 今月のサマリー</div>
@@ -654,6 +622,59 @@ tr:last-child td{border-bottom:none}
 
 <!-- ファイル読込用 -->
 <input type="file" id="import-file" accept=".json,application/json" style="display:none" onchange="handleImport(event)">
+
+<!-- 支払い追加フォームモーダル -->
+<div id="add-form-modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:0 0 24px;animation:slideUp .22s ease">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:1">
+      <span style="font-size:15px;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:6px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M12 5v14M5 12h14"/></svg>
+        支払いを追加
+      </span>
+      <button onclick="closeAddForm()" style="background:none;border:none;font-size:22px;color:var(--text-sub);cursor:pointer;padding:0 4px;line-height:1">×</button>
+    </div>
+    <div style="padding:14px 18px 0">
+      <div class="form-grid">
+        <div class="form-full">
+          <label>月日</label>
+          <input type="date" id="in-date">
+        </div>
+        <div>
+          <label>金額（円）</label>
+          <div class="amount-input-display" id="amount-display" onclick="openTenkey('main')">
+            <span class="placeholder" id="amount-display-text">タップして入力</span>
+            <span style="font-size:13px;color:#aab">▼</span>
+          </div>
+          <input type="hidden" id="in-amount" value="">
+        </div>
+        <div class="form-full">
+          <label>支払先</label>
+          <input type="text" id="in-payee" placeholder="例：関西電力" list="payee-list">
+          <datalist id="payee-list"></datalist>
+        </div>
+        <div class="form-full">
+          <label>用途</label>
+          <input type="text" id="in-purpose" placeholder="例：電気代 1月分">
+        </div>
+        <div class="form-full">
+          <label>備考</label>
+          <input type="text" id="in-note" placeholder="例：2/6引落">
+        </div>
+        <div class="form-full">
+          <label>請求分</label>
+          <div class="ratio-toggle-row">
+            <button class="ratio-toggle active" id="in-ratio-50" onclick="setInputRatio(50)">50%</button>
+            <button class="ratio-toggle" id="in-ratio-100" onclick="setInputRatio(100)">100%</button>
+          </div>
+        </div>
+      </div>
+      <div class="tkey-action-row" style="margin-top:14px">
+        <button class="tkey-cancel" onclick="closeAddForm()">キャンセル</button>
+        <button class="tkey-ok" onclick="addEntry()">追加する</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="pwa-install-bar" style="display:none;position:fixed;bottom:calc(var(--tab-h) + 10px);left:12px;right:12px;z-index:400;background:#1a3a4a;color:#fff;border-radius:14px;padding:12px 16px;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,.3);">
   <span style="font-size:22px">💴</span>
   <div style="flex:1;line-height:1.4">
@@ -902,6 +923,15 @@ function switchTab(tab){
   if(tab==='yearly')renderYearly();
 }
 
+// ── ADD FORM MODAL ──
+function openAddForm(){
+  document.getElementById('in-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('add-form-modal').style.display='flex';
+}
+function closeAddForm(){
+  document.getElementById('add-form-modal').style.display='none';
+}
+
 // ── INPUT TAB ──
 function renderInputTab(){
   updatePayeeDatalist();
@@ -965,6 +995,7 @@ function addEntry(){
   document.getElementById('in-note').value='';
   setInputRatio(50);
   showToast('✓ 追加しました');
+  closeAddForm();
   renderInputTab();
 }
 function addPeriodicEntry(pid,dateVal){
@@ -1287,8 +1318,8 @@ function installPWA(){
 
 // ── INIT ──
 window.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('in-date').value=new Date().toISOString().slice(0,10);
   document.getElementById('header-month').textContent=`${reportYear}年${reportMonth}月`;
+  document.getElementById('add-form-modal').addEventListener('click',function(e){if(e.target===this)closeAddForm()});
   document.getElementById('tenkey-modal').addEventListener('click',function(e){if(e.target===this)closeTenkey()});
   document.getElementById('save-modal').addEventListener('click',function(e){if(e.target===this)closeSaveModal()});
   document.getElementById('load-modal').addEventListener('click',function(e){if(e.target===this)closeLoadModal()});

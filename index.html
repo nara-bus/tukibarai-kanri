@@ -477,11 +477,37 @@ tr:last-child td{border-bottom:none}
   .td-note{font-size:14px!important;color:#333!important;max-width:none!important}
   .tag{font-size:13px!important;padding:2px 7px!important}
 
-  /* ─ 金額列幅固定・右揃え ─ */
-  #tab-report .tbl-wrap{margin-bottom:0!important}
-  .col-amount{width:100px!important;text-align:right!important}
+  /* ─ 列幅：colgroup で全列を% 指定で管理 ─ */
+  /* 月日:7% 支払先:26% 用途:20% 金額:12% 請求:6% 備考:13% 操作:非表示 */
+  #tab-report .tbl-wrap{margin-bottom:0!important;overflow:visible!important}
+  col.col-date   {width:7%!important}
+  col.col-payee  {width:18%!important}
+  col.col-purpose{width:28%!important}
+  col.col-amount {width:12%!important}
+  col.col-billing{width:6%!important}
+  col.col-note   {width:13%!important}
+
+  /* 月日：折り返しなし・詰める */
+  .td-date{white-space:nowrap!important;font-size:15px!important;color:#000!important}
+
+  /* 請求：黒テキスト・折り返しなし */
+  .col-billing{text-align:center!important;white-space:nowrap!important}
+  .no-print{display:none!important}
+  .print-only{display:inline!important;font-size:15px!important;font-weight:400!important;color:#000!important}
+
+  /* 金額：右揃え・折り返しなし */
+  .col-amount{text-align:right!important;white-space:nowrap!important}
   .amount{text-align:right!important;white-space:nowrap!important;font-variant-numeric:tabular-nums!important;font-size:16px!important}
   .amount.negative{color:#c00!important}
+
+  /* 備考：折り返しあり */
+  .col-note{white-space:normal!important;word-break:break-all!important;font-size:14px!important;color:#333!important}
+
+  /* 支払先・用途：折り返しあり */
+  .col-payee{white-space:normal!important;word-break:break-all!important;font-weight:400!important}
+  .col-purpose{white-space:normal!important;word-break:break-all!important;font-size:15px!important}
+
+  .tag{font-size:12px!important;padding:1px 5px!important;white-space:nowrap!important}
 
   /* ─ 集計エリア：アプリと同じ全行を表示・右寄せ ─ */
   .print-hide{display:flex!important}  /* 全行表示に戻す */
@@ -514,6 +540,7 @@ tr:last-child td{border-bottom:none}
   #print-billing-row .summary-value{font-size:24px!important;font-weight:800!important;color:#000!important}
   .summary-total{font-size:18px!important;color:#000!important}
 }
+.print-only{display:none}
 .tkey-wide{grid-column:span 1}
 </style>
 </head>
@@ -570,6 +597,16 @@ tr:last-child td{border-bottom:none}
       <div class="card-body" style="padding:0">
         <div class="tbl-wrap">
           <table>
+            <!-- 印刷時の列幅制御用 -->
+            <colgroup>
+              <col class="col-date">
+              <col class="col-payee">
+              <col class="col-purpose">
+              <col class="col-amount">
+              <col class="col-billing">
+              <col class="col-note">
+              <col class="no-print">
+            </colgroup>
             <thead><tr>
               <th>月日</th><th>支払先</th><th>用途</th>
               <th class="col-amount" style="text-align:right">金額</th><th>請求</th><th>備考</th>
@@ -1220,11 +1257,14 @@ function renderReport(){
       const pct=e.ratio_pct||50;
       return`<tr>
         <td class="td-date">${fmtDate(e.date)}</td>
-        <td class="td-payee">${e.payee}</td>
-        <td style="font-size:14px">${e.purpose||''}</td>
+        <td class="td-payee col-payee">${e.payee}</td>
+        <td class="col-purpose" style="font-size:14px">${e.purpose||''}</td>
         <td class="amount col-amount ${Number(e.amount)<0?'negative':''}">${fmt(e.amount)}</td>
-        <td>${rateBadge(pct)}</td>
-        <td class="td-note">${e.note||''}</td>
+        <td class="col-billing">
+          <span class="no-print">${rateBadge(pct)}</span>
+          <span class="print-only" style="font-size:15px;font-weight:700;color:#000">${pct}%</span>
+        </td>
+        <td class="td-note col-note">${e.note||''}</td>
         <td class="no-print"><button class="icon-btn" onclick="openEditModal('${e.id}')">✏️</button></td>
       </tr>`;
     }).join('');

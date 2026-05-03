@@ -1577,6 +1577,30 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('edit-modal').addEventListener('click',function(e){if(e.target===this)closeEditModal()});
   document.getElementById('periodic-edit-modal').addEventListener('click',function(e){if(e.target===this)closePeriodicEditModal()});
   renderInputTab();
+
+  // ── スワイプでタブ切替 ──
+  const TABS = ['input','report','settings','yearly'];
+  const mainEl = document.getElementById('main');
+  let _swipeX = null, _swipeY = null;
+  mainEl.addEventListener('touchstart', e => {
+    const tag = e.target.tagName;
+    if(tag==='INPUT'||tag==='SELECT'||tag==='BUTTON'||tag==='TEXTAREA'){_swipeX=null;return;}
+    // モーダルが開いている場合は無視
+    const modals = ['add-form-modal','tenkey-modal','save-modal','load-modal','edit-modal','periodic-edit-modal'];
+    if(modals.some(id=>document.getElementById(id)&&document.getElementById(id).style.display!=='none'&&document.getElementById(id).classList.contains('open'))){_swipeX=null;return;}
+    _swipeX = e.touches[0].clientX;
+    _swipeY = e.touches[0].clientY;
+  }, {passive:true});
+  mainEl.addEventListener('touchend', e => {
+    if(_swipeX===null) return;
+    const dx = e.changedTouches[0].clientX - _swipeX;
+    const dy = e.changedTouches[0].clientY - _swipeY;
+    _swipeX = null; _swipeY = null;
+    if(Math.abs(dx) < 50 || Math.abs(dx) <= Math.abs(dy)) return;
+    const idx = TABS.indexOf(currentTab);
+    const next = dx < 0 ? TABS[Math.min(idx+1, TABS.length-1)] : TABS[Math.max(idx-1, 0)];
+    if(next !== currentTab) switchTab(next);
+  }, {passive:true});
 });
 </script>
 </body>

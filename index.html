@@ -211,8 +211,8 @@ textarea{resize:vertical;min-height:56px}
 #tenkey-modal.open{display:flex}
 .tenkey-sheet{
   background:linear-gradient(160deg,#fdf6ec 0%,#f7ede0 100%);
-  border-radius:22px;padding:20px 16px 16px;
-  width:calc(100% - 40px);max-width:360px;
+  border-radius:18px;padding:14px 12px 12px;
+  width:calc(100% - 60px);max-width:280px;
   box-shadow:0 12px 50px rgba(80,40,20,.25),0 1px 0 rgba(255,255,255,.8) inset;
   border:1px solid rgba(200,160,120,.25);
   animation:fadeScaleIn .18s ease;
@@ -220,52 +220,52 @@ textarea{resize:vertical;min-height:56px}
 @keyframes fadeScaleIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .tenkey-title{
-  text-align:center;font-size:15px;font-weight:700;
-  color:var(--primary);margin-bottom:12px;letter-spacing:.05em;
+  text-align:center;font-size:13px;font-weight:700;
+  color:var(--primary);margin-bottom:8px;letter-spacing:.05em;
 }
 .tenkey-disp{
   background:rgba(255,252,245,.8);color:var(--text);
-  border:1.5px solid var(--border);border-radius:12px;
-  padding:14px 18px;margin-bottom:14px;
-  font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;
-  text-align:center;min-height:60px;display:flex;align-items:center;justify-content:center;
+  border:1.5px solid var(--border);border-radius:10px;
+  padding:8px 12px;margin-bottom:8px;
+  font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;
+  text-align:center;min-height:44px;display:flex;align-items:center;justify-content:center;
   box-shadow:0 1px 4px rgba(120,80,50,.08) inset;
 }
-.tkey-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.tkey-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .tkey{
   background:linear-gradient(160deg,#fdf0e0 0%,#f5e4cc 100%);
-  color:var(--text);border:1px solid rgba(180,140,100,.2);border-radius:12px;
-  font-size:22px;font-weight:700;font-family:'Zen Maru Gothic','Hiragino Kaku Gothic ProN',sans-serif;
-  padding:15px 0;
+  color:var(--text);border:1px solid rgba(180,140,100,.2);border-radius:10px;
+  font-size:18px;font-weight:700;font-family:'Zen Maru Gothic','Hiragino Kaku Gothic ProN',sans-serif;
+  padding:10px 0;
   cursor:pointer;
-  box-shadow:0 3px 0 rgba(160,110,70,.25),0 4px 8px rgba(120,70,30,.08);
+  box-shadow:0 2px 0 rgba(160,110,70,.25),0 3px 6px rgba(120,70,30,.08);
   transform:translateY(0);transition:box-shadow .08s,transform .08s,background .1s;
   user-select:none;
 }
-.tkey:active{box-shadow:0 1px 0 rgba(160,110,70,.2);transform:translateY(2px);background:linear-gradient(160deg,#ecdfc8 0%,#e5d0b5 100%)}
-.tkey-del{background:linear-gradient(160deg,#fce8e8 0%,#f5d8d8 100%);color:#c26060;border-color:rgba(180,100,100,.2);box-shadow:0 3px 0 rgba(160,80,80,.2)}
-.tkey-del:active{box-shadow:0 1px 0 rgba(160,80,80,.15);transform:translateY(2px)}
-.tkey-clear{background:linear-gradient(160deg,#fce8e8 0%,#f5d8d8 100%);color:#c26060;border-color:rgba(180,100,100,.2);box-shadow:0 3px 0 rgba(160,80,80,.2)}
-.tkey-clear:active{box-shadow:0 1px 0 rgba(160,80,80,.15);transform:translateY(2px)}
-.tkey-action-row{display:flex;gap:10px;margin-top:12px}
+.tkey:active{box-shadow:0 1px 0 rgba(160,110,70,.2);transform:translateY(1px);background:linear-gradient(160deg,#ecdfc8 0%,#e5d0b5 100%)}
+.tkey-del{background:linear-gradient(160deg,#fce8e8 0%,#f5d8d8 100%);color:#c26060;border-color:rgba(180,100,100,.2);box-shadow:0 2px 0 rgba(160,80,80,.2)}
+.tkey-del:active{box-shadow:0 1px 0 rgba(160,80,80,.15);transform:translateY(1px)}
+.tkey-clear{background:linear-gradient(160deg,#fce8e8 0%,#f5d8d8 100%);color:#c26060;border-color:rgba(180,100,100,.2);box-shadow:0 2px 0 rgba(160,80,80,.2)}
+.tkey-clear:active{box-shadow:0 1px 0 rgba(160,80,80,.15);transform:translateY(1px)}
+.tkey-action-row{display:flex;gap:7px;margin-top:8px}
 .tkey-cancel{
   flex:1;background:rgba(240,230,218,.8);color:var(--text-sub);
-  border:1px solid rgba(180,140,100,.2);border-radius:12px;
-  font-size:16px;font-weight:700;font-family:'Zen Maru Gothic','Hiragino Kaku Gothic ProN',sans-serif;
-  padding:15px 0;
+  border:1px solid rgba(180,140,100,.2);border-radius:10px;
+  font-size:14px;font-weight:700;font-family:'Zen Maru Gothic','Hiragino Kaku Gothic ProN',sans-serif;
+  padding:10px 0;
   cursor:pointer;box-shadow:0 2px 0 rgba(160,120,80,.2);
   transform:translateY(0);transition:box-shadow .08s,transform .08s;
 }
 .tkey-cancel:active{box-shadow:0 1px 0 rgba(160,120,80,.15);transform:translateY(1px)}
 .tkey-ok{
   flex:2;background:linear-gradient(135deg,#a88778 0%,#8b6f5e 100%);
-  color:#fdf0e0;border:none;border-radius:12px;
-  font-size:16px;font-weight:700;font-family:'Zen Maru Gothic','Hiragino Kaku Gothic ProN',sans-serif;
-  padding:15px 0;
-  cursor:pointer;box-shadow:0 3px 0 #6a5040,0 4px 10px rgba(100,60,40,.15);
+  color:#fdf0e0;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;font-family:'Zen Maru Gothic','Hiragino Kaku Gothic ProN',sans-serif;
+  padding:10px 0;
+  cursor:pointer;box-shadow:0 2px 0 #6a5040,0 3px 8px rgba(100,60,40,.15);
   transform:translateY(0);transition:box-shadow .08s,transform .08s;
 }
-.tkey-ok:active{box-shadow:0 1px 0 #6a5040;transform:translateY(2px)}
+.tkey-ok:active{box-shadow:0 1px 0 #6a5040;transform:translateY(1px)}
 
 
 /* ── 保存・読込モーダル ── */
@@ -449,29 +449,38 @@ tr:last-child td{border-bottom:none}
 
   /* ─ カード ─ */
   .card{
-    box-shadow:none!important;border:2px solid #000!important;
+    box-shadow:none!important;
+    border:0.5px solid #000!important;
     margin-bottom:10px!important;break-inside:avoid;background:#fff!important;
   }
   .card::before{display:none!important}
   .card-header{
     background:#eee!important;color:#000!important;
-    border-bottom:2px solid #000!important;
+    border:none!important;
+    border-bottom:0.5px solid #000!important;
     font-size:16px!important;padding:6px 10px!important;font-weight:700!important;
   }
   .card-body{padding:0!important}
 
   /* ─ テーブル全体 16px・枠線黒 ─ */
-  table{width:100%!important;border-collapse:collapse!important;border:2px solid #000!important;font-size:16px!important}
+  table{width:100%!important;border-collapse:collapse!important;border:none!important;font-size:16px!important}
   th{
     background:#ddd!important;color:#000!important;
-    border:1.5px solid #000!important;
+    border:none!important;
+    border-right:0.5px solid #000!important;
+    border-bottom:0.5px solid #000!important;
     padding:6px 8px!important;font-size:16px!important;font-weight:700!important;
     white-space:nowrap!important;
   }
+  th:last-child{border-right:none!important}
   td{
-    border:1.5px solid #000!important;
+    border:none!important;
+    border-right:0.5px solid #000!important;
+    border-bottom:0.5px solid #000!important;
     padding:5px 8px!important;font-size:16px!important;color:#000!important;
   }
+  td:last-child{border-right:none!important}
+  tr:last-child td{border-bottom:none!important}
   tr:nth-child(even) td{background:#f5f5f5!important}
   .td-date{font-size:15px!important;color:#000!important}
   .td-note{font-size:14px!important;color:#333!important;max-width:none!important}
@@ -528,8 +537,8 @@ tr:last-child td{border-bottom:none}
     display:flex!important;justify-content:space-between!important;gap:32px!important;
   }
   .summary-row:last-child{border-bottom:none!important}
-  .summary-label{color:#000!important;font-size:16px!important}
-  .summary-value{font-size:16px!important;color:#000!important;font-weight:700!important}
+  .summary-label{color:#000!important;font-size:16px!important;font-weight:400!important}
+  .summary-value{font-size:16px!important;color:#000!important;font-weight:400!important}
 
   /* ─ 請求合計行を強調 24px ─ */
   #print-billing-row{

@@ -99,8 +99,8 @@ body{
 }
 .tab-btn.active{color:#fdf0e0}
 .tab-btn.active .tab-label{font-weight:700}
-.tab-btn svg{width:22px;height:22px}
-.tab-label{font-size:12px;letter-spacing:.04em}
+.tab-btn svg{width:20px;height:20px}
+.tab-label{font-size:11px;letter-spacing:.02em}
 
 /* ── MAIN ── */
 #main{
@@ -717,7 +717,42 @@ tr:last-child td{border-bottom:none}
       </div>
     </div>
   </div>
-</div>
+
+  <div id="tab-special" class="tab-content">
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-body">
+        <!-- 年ナビ + 追加ボタン -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="flex:1"></div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button class="hbtn" style="min-width:32px;padding:5px 7px;font-size:16px;color:#fdf0e0;background:rgba(160,120,80,.55);border-color:rgba(160,120,80,.4)" onclick="specialYearMove(-1)">‹</button>
+            <span id="special-year-label" style="font-size:16px;font-weight:700;color:var(--accent);min-width:72px;text-align:center"></span>
+            <button class="hbtn" style="min-width:32px;padding:5px 7px;font-size:16px;color:#fdf0e0;background:rgba(160,120,80,.55);border-color:rgba(160,120,80,.4)" onclick="specialYearMove(1)">›</button>
+          </div>
+          <div style="flex:1;display:flex;justify-content:flex-end">
+            <button onclick="openSpecialAddModal()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;width:32px;height:32px;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.15)">＋</button>
+          </div>
+        </div>
+        <!-- テーブル -->
+        <div class="tbl-wrap" style="overflow-x:visible;overflow-y:visible">
+          <table id="special-table" style="width:100%">
+            <thead><tr>
+              <th style="white-space:nowrap">月日</th>
+              <th>支払先</th>
+              <th>用途</th>
+              <th class="amount">金額</th>
+              <th>方法</th>
+              <th style="width:52px"></th>
+            </tr></thead>
+            <tbody id="special-tbody"></tbody>
+          </table>
+        </div>
+        <div id="special-total" style="text-align:right;margin-top:10px;font-weight:700;font-size:15px;color:var(--accent)"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /#main -->
 
 <!-- TAB BAR -->
 <div id="tab-bar">
@@ -729,17 +764,19 @@ tr:last-child td{border-bottom:none}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
     <span class="tab-label">月次</span>
   </button>
-  <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    <span class="tab-label">設定</span>
-  </button>
   <button class="tab-btn" data-tab="yearly" onclick="switchTab('yearly')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
     <span class="tab-label">年間</span>
   </button>
+  <button class="tab-btn" data-tab="special" onclick="switchTab('special')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <span class="tab-label">特別</span>
+  </button>
+  <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span class="tab-label">設定</span>
+  </button>
 </div>
-
-<!-- TENKEY MODAL -->
 <div id="tenkey-modal">
   <div class="tenkey-sheet">
     <div class="tenkey-title">金額を入力</div>
@@ -919,6 +956,37 @@ tr:last-child td{border-bottom:none}
 </div>
 
 <div id="toast"></div>
+
+<!-- 特別支払い 追加・編集モーダル -->
+<div id="special-add-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-end;justify-content:center">
+  <div style="background:var(--card);border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;max-width:520px;box-shadow:0 -4px 24px rgba(0,0,0,.2)">
+    <div id="sp2-modal-title" style="font-weight:700;font-size:16px;color:var(--accent);margin-bottom:16px;text-align:center">特別支払い　追加</div>
+    <input type="hidden" id="sp2-edit-id">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div><label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">年</label>
+        <input type="number" id="sp2-year" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box" min="2020" max="2099"></div>
+      <div><label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">月日（MM-DD）</label>
+        <input type="text" id="sp2-mmdd" placeholder="01-15" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box"></div>
+    </div>
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">支払先</label>
+      <input type="text" id="sp2-payee" placeholder="例：三井住友海上" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box"></div>
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">用途</label>
+      <input type="text" id="sp2-purpose" placeholder="例：任意保険 ミラ・イース" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div><label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">金額（円）</label>
+        <input type="number" id="sp2-amount" placeholder="0" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box" min="0"></div>
+      <div><label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">支払方法</label>
+        <input type="text" id="sp2-method" placeholder="例：現金" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box"></div>
+    </div>
+    <div id="sp2-delete-row" style="display:none;margin-bottom:10px">
+      <button onclick="deleteSpecialRowFromModal()" style="width:100%;padding:11px;border-radius:12px;border:1.5px solid rgba(192,112,96,.4);background:none;font-size:14px;font-weight:600;color:#c07060;cursor:pointer">🗑　この行を削除</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button onclick="closeSpecialAddModal()" style="padding:12px;border-radius:12px;border:1.5px solid rgba(160,120,80,.3);background:none;font-size:15px;font-weight:600;color:#8a6a4a;cursor:pointer">キャンセル</button>
+      <button onclick="saveSpecialRow()" style="padding:12px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:700;cursor:pointer">保存</button>
+    </div>
+  </div>
+</div>
 
 <!-- 保存モーダル -->
 <div id="save-modal">
@@ -1154,7 +1222,170 @@ function rateBadge(pct){
     :`<span style="background:#e0f0ff;color:#1a6aaa;border-radius:10px;font-size:10px;padding:1px 6px;font-weight:700">50%</span>`;
 }
 
-// ── TABS ──
+// ── SPECIAL TAB (特別支払い) ── 完全独立 ──
+const SK_SP = 'tsukiharai_special_v1';
+function loadSpecial(){
+  try{return JSON.parse(localStorage.getItem(SK_SP)||'[]');}catch(e){return [];}
+}
+function saveSpecial(data){
+  localStorage.setItem(SK_SP, JSON.stringify(data));
+}
+
+// 初期データ投入（初回のみ）
+(function initSpecialData(){
+  if(localStorage.getItem(SK_SP)) return; // すでにデータあれば何もしない
+  const mk = (id,year,mmdd,payee,purpose,amount,method)=>({id,year,mmdd,payee,purpose,amount,method});
+  const data = [
+    // 2025年
+    mk('init2025_01',2025,'01-27','三井住友海上','任意保険　ミラ・イース','38920','給料天引'),
+    mk('init2025_02',2025,'03-26','共栄火災海上保険','火災保険　旧宅','48650','銀行引落'),
+    mk('init2025_03',2025,'04-15','広陵町','固定資産税','112300','振込'),
+    mk('init2025_04',2025,'05-27','三井住友海上','任意保険　ハスラー','32830','給料天引'),
+    mk('init2025_05',2025,'05-30','広陵町','軽自動車税　ミラ・イース','10800','振込'),
+    mk('init2025_06',2025,'05-30','広陵町','軽自動車税　ハスラー','10800','振込'),
+    mk('init2025_07',2025,'06-25','才音寺','区費','5000','現金'),
+    mk('init2025_08',2025,'06-26','NHK','受信料　年一括払い','11356','銀行引落'),
+    mk('init2025_09',2025,'10-26','共栄火災海上保険','火災保険（新宅）','60590','銀行引落'),
+    mk('init2025_10',2025,'12-15','才音寺','区費','5000','現金'),
+    mk('init2025_11',2025,'','辻谷','7年産米＠18,000-×30kg×5袋','90000','現金'),
+    mk('init2025_12',2025,'','速太郎','車検代　ミラ・イース','','現金'),
+    mk('init2025_13',2025,'','速太郎','車検代　ハスラー','','現金'),
+    // 2026年
+    mk('init2026_01',2026,'01-27','三井住友海上','任意保険　ミラ・イース','45410','給料天引'),
+    mk('init2026_02',2026,'01-28','速太郎','車検代　ミラ・イース　@38,440-','38440','現金'),
+    mk('init2026_03',2026,'01-28','速太郎','車検代　ハスラー　@38,440- タイヤエンドブーツ交換他@15,792-','54412','現金'),
+    mk('init2026_04',2026,'03-26','共栄火災海上保険','火災保険　旧宅','48650','銀行引落'),
+    mk('init2026_05',2026,'04-10','広陵町','固定資産税','112000','振込'),
+    mk('init2026_06',2026,'05-27','三井住友海上','任意保険　ハスラー','32830','給料天引'),
+    mk('init2026_07',2026,'05-30','広陵町','軽自動車税　ミラ・イース','10800','振込'),
+    mk('init2026_08',2026,'05-30','広陵町','軽自動車税　ハスラー','10800','振込'),
+    mk('init2026_09',2026,'06-25','才音寺','区費','5000','現金'),
+    mk('init2026_10',2026,'06-26','NHK','受信料　年一括払い','11356','銀行引落'),
+    mk('init2026_11',2026,'10-26','共栄火災海上保険','火災保険（新宅）','60590','銀行引落'),
+    mk('init2026_12',2026,'12-15','才音寺','区費','5000','現金'),
+  ];
+  saveSpecial(data);
+})();
+
+let _spYear = 2026;
+
+function renderSpecialTab(){
+  const all = loadSpecial();
+  const years = [...new Set([...all.map(r=>r.year), new Date().getFullYear()])].sort((a,b)=>a-b);
+  if(!years.includes(_spYear)) _spYear = years[years.length-1];
+  document.getElementById('special-year-label').textContent = `${_spYear}年`;
+
+  const rows = all.filter(r=>r.year===_spYear).sort((a,b)=>(a.mmdd||'99-99').localeCompare(b.mmdd||'99-99'));
+  const tbody = document.getElementById('special-tbody');
+  if(rows.length===0){
+    tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:#b0906a;padding:20px;font-size:13px">データがありません</td></tr>`;
+    document.getElementById('special-total').textContent='';
+    return;
+  }
+  tbody.innerHTML = rows.map(r=>`
+    <tr>
+      <td style="font-size:12px;white-space:nowrap">${formatSpecialDate(r.mmdd)}</td>
+      <td style="font-size:12px">${esc(r.payee)}</td>
+      <td style="font-size:11px;color:#7a5c3a">${esc(r.purpose)}</td>
+      <td class="amount" style="font-size:12px;white-space:nowrap">${r.amount?'¥'+Number(r.amount).toLocaleString():'-'}</td>
+      <td style="font-size:11px;color:#7a5c3a">${esc(r.method)}</td>
+      <td style="text-align:center">
+        <button onclick="openSpecialEditModal('${r.id}')" style="background:none;border:none;cursor:pointer;color:#8a9a6a;font-size:14px;padding:1px 2px" title="編集">✎</button>
+      </td>
+    </tr>
+  `).join('');
+  const total = rows.reduce((s,r)=>s+(Number(r.amount)||0),0);
+  document.getElementById('special-total').textContent = total>0 ? `合計　¥${total.toLocaleString()}` : '';
+}
+
+function formatSpecialDate(mmdd){
+  if(!mmdd) return '-';
+  const [m,d] = mmdd.split('-');
+  return m&&d ? `${parseInt(m)}/${parseInt(d)}` : mmdd;
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function specialYearMove(dir){
+  const all = loadSpecial();
+  const years = [...new Set([...all.map(r=>r.year), new Date().getFullYear()])].sort((a,b)=>a-b);
+  const idx = years.indexOf(_spYear);
+  const next = idx + dir;
+  if(next >= 0 && next < years.length){ _spYear = years[next]; renderSpecialTab(); }
+}
+
+function deleteSpecialRow(id){
+  if(!confirm('この行を削除しますか？')) return;
+  saveSpecial(loadSpecial().filter(r=>r.id!==id));
+  renderSpecialTab();
+}
+
+// ── 追加・編集モーダル ──
+function openSpecialAddModal(){
+  const now = new Date();
+  const m = document.getElementById('special-add-modal');
+  m.querySelector('#sp2-modal-title').textContent = '特別支払い　追加';
+  m.querySelector('#sp2-edit-id').value = '';
+  m.querySelector('#sp2-year').value = _spYear;
+  m.querySelector('#sp2-mmdd').value = `${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  m.querySelector('#sp2-payee').value = '';
+  m.querySelector('#sp2-purpose').value = '';
+  m.querySelector('#sp2-amount').value = '';
+  m.querySelector('#sp2-method').value = '現金';
+  m.querySelector('#sp2-delete-row').style.display = 'none';
+  m.style.display = 'flex';
+}
+function openSpecialEditModal(id){
+  const row = loadSpecial().find(r=>r.id===id);
+  if(!row) return;
+  const m = document.getElementById('special-add-modal');
+  m.querySelector('#sp2-modal-title').textContent = '特別支払い　編集';
+  m.querySelector('#sp2-edit-id').value = id;
+  m.querySelector('#sp2-year').value = row.year;
+  m.querySelector('#sp2-mmdd').value = row.mmdd || '';
+  m.querySelector('#sp2-payee').value = row.payee || '';
+  m.querySelector('#sp2-purpose').value = row.purpose || '';
+  m.querySelector('#sp2-amount').value = row.amount || '';
+  m.querySelector('#sp2-method').value = row.method || '';
+  m.querySelector('#sp2-delete-row').style.display = 'block';
+  m.style.display = 'flex';
+}
+function deleteSpecialRowFromModal(){
+  const id = document.getElementById('sp2-edit-id').value;
+  if(!id) return;
+  if(!confirm('この行を削除しますか？')) return;
+  saveSpecial(loadSpecial().filter(r=>r.id!==id));
+  closeSpecialAddModal();
+  renderSpecialTab();
+  showToast('✓ 削除しました');
+}
+function closeSpecialAddModal(){
+  document.getElementById('special-add-modal').style.display = 'none';
+}
+function saveSpecialRow(){
+  const m = document.getElementById('special-add-modal');
+  const editId = m.querySelector('#sp2-edit-id').value;
+  const year   = parseInt(m.querySelector('#sp2-year').value)||new Date().getFullYear();
+  const mmdd   = m.querySelector('#sp2-mmdd').value.trim();
+  const payee  = m.querySelector('#sp2-payee').value.trim();
+  const purpose= m.querySelector('#sp2-purpose').value.trim();
+  const amount = m.querySelector('#sp2-amount').value.replace(/[^\d]/g,'');
+  const method = m.querySelector('#sp2-method').value.trim();
+  if(!payee){alert('支払先を入力してください');return;}
+  let data = loadSpecial();
+  if(editId){
+    data = data.map(r=>r.id===editId ? {...r,year,mmdd,payee,purpose,amount,method} : r);
+    showToast('✓ 更新しました');
+  } else {
+    data.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),year,mmdd,payee,purpose,amount,method});
+    showToast('✓ 追加しました');
+  }
+  saveSpecial(data);
+  _spYear = year;
+  closeSpecialAddModal();
+  renderSpecialTab();
+}
+
+// ── TABS (update) ──
 function switchTab(tab){
   currentTab=tab;
   document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
@@ -1165,9 +1396,51 @@ function switchTab(tab){
   if(tab==='report')renderReport();
   if(tab==='settings')renderSettings();
   if(tab==='yearly')renderYearly();
+  if(tab==='special')renderSpecialTab();
 }
 
-// ── ADD FORM MODAL ──
+// ── INIT ──
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('header-month').textContent=`${reportYear}年${reportMonth}月`;
+  document.getElementById('add-form-modal').addEventListener('click',function(e){if(e.target===this)closeAddForm()});
+  document.getElementById('tenkey-modal').addEventListener('click',function(e){if(e.target===this)closeTenkey()});
+  document.getElementById('save-modal').addEventListener('click',function(e){if(e.target===this)closeSaveModal()});
+  document.getElementById('load-modal').addEventListener('click',function(e){if(e.target===this)closeLoadModal()});
+  document.getElementById('edit-modal').addEventListener('click',function(e){if(e.target===this)closeEditModal()});
+  document.getElementById('periodic-edit-modal').addEventListener('click',function(e){if(e.target===this)closePeriodicEditModal()});
+  document.getElementById('special-add-modal').addEventListener('click',function(e){if(e.target===this)closeSpecialAddModal()});
+
+  // ── スワイプでタブ切替 ──
+  const TABS = ['input','report','yearly','special','settings'];
+  let _sx=null,_sy=null,_cancelled=false;
+  document.addEventListener('touchstart',e=>{
+    const tag=e.target.tagName;
+    if(tag==='INPUT'||tag==='SELECT'||tag==='BUTTON'||tag==='TEXTAREA'){_sx=null;return;}
+    // モーダルが開いていたら無視
+    if(document.querySelector('[style*="display: flex"][id$="-modal"],[style*="display:flex"][id$="-modal"]')){_sx=null;return;}
+    _sx=e.touches[0].clientX;
+    _sy=e.touches[0].clientY;
+    _cancelled=false;
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(_sx===null||_cancelled)return;
+    const dx=Math.abs(e.touches[0].clientX-_sx);
+    const dy=Math.abs(e.touches[0].clientY-_sy);
+    if(dy>8){_cancelled=true;} // 縦が先に動いたらスワイプキャンセル
+  },{passive:true});
+  document.addEventListener('touchend',e=>{
+    if(_sx===null||_cancelled){_sx=null;return;}
+    const dx=e.changedTouches[0].clientX-_sx;
+    const dy=e.changedTouches[0].clientY-_sy;
+    _sx=null;
+    if(Math.abs(dx)<55||Math.abs(dx)<=Math.abs(dy)*1.5)return;
+    const idx=TABS.indexOf(currentTab);
+    const next=dx<0?TABS[Math.min(idx+1,TABS.length-1)]:TABS[Math.max(idx-1,0)];
+    if(next!==currentTab)switchTab(next);
+  },{passive:true});
+
+  renderInputTab();
+});
 function openAddForm(){
   document.getElementById('in-date').value=new Date().toISOString().slice(0,10);
   document.getElementById('add-form-modal').style.display='flex';
@@ -1568,40 +1841,6 @@ function installPWA(){
 }
 
 // ── INIT ──
-window.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('header-month').textContent=`${reportYear}年${reportMonth}月`;
-  document.getElementById('add-form-modal').addEventListener('click',function(e){if(e.target===this)closeAddForm()});
-  document.getElementById('tenkey-modal').addEventListener('click',function(e){if(e.target===this)closeTenkey()});
-  document.getElementById('save-modal').addEventListener('click',function(e){if(e.target===this)closeSaveModal()});
-  document.getElementById('load-modal').addEventListener('click',function(e){if(e.target===this)closeLoadModal()});
-  document.getElementById('edit-modal').addEventListener('click',function(e){if(e.target===this)closeEditModal()});
-  document.getElementById('periodic-edit-modal').addEventListener('click',function(e){if(e.target===this)closePeriodicEditModal()});
-  renderInputTab();
-
-  // ── スワイプでタブ切替 ──
-  const TABS = ['input','report','settings','yearly'];
-  const mainEl = document.getElementById('main');
-  let _swipeX = null, _swipeY = null;
-  mainEl.addEventListener('touchstart', e => {
-    const tag = e.target.tagName;
-    if(tag==='INPUT'||tag==='SELECT'||tag==='BUTTON'||tag==='TEXTAREA'){_swipeX=null;return;}
-    // モーダルが開いている場合は無視
-    const modals = ['add-form-modal','tenkey-modal','save-modal','load-modal','edit-modal','periodic-edit-modal'];
-    if(modals.some(id=>document.getElementById(id)&&document.getElementById(id).style.display!=='none'&&document.getElementById(id).classList.contains('open'))){_swipeX=null;return;}
-    _swipeX = e.touches[0].clientX;
-    _swipeY = e.touches[0].clientY;
-  }, {passive:true});
-  mainEl.addEventListener('touchend', e => {
-    if(_swipeX===null) return;
-    const dx = e.changedTouches[0].clientX - _swipeX;
-    const dy = e.changedTouches[0].clientY - _swipeY;
-    _swipeX = null; _swipeY = null;
-    if(Math.abs(dx) < 50 || Math.abs(dx) <= Math.abs(dy)) return;
-    const idx = TABS.indexOf(currentTab);
-    const next = dx < 0 ? TABS[Math.min(idx+1, TABS.length-1)] : TABS[Math.max(idx-1, 0)];
-    if(next !== currentTab) switchTab(next);
-  }, {passive:true});
-});
 </script>
 </body>
 </html>

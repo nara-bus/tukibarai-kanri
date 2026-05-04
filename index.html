@@ -174,12 +174,12 @@ textarea{resize:vertical;min-height:56px}
   letter-spacing:.03em;transition:opacity .15s,transform .1s,box-shadow .1s;
 }
 .btn:active{opacity:.85;transform:scale(.97)}
-.btn-primary{background:linear-gradient(135deg,#a88778 0%,#8b6f5e 100%);color:#fdf0e0;box-shadow:0 2px 0 #6a5040,0 4px 10px rgba(100,60,40,.15)}
-.btn-primary:active{box-shadow:0 1px 0 #6a5040}
+.btn-primary{background:linear-gradient(135deg,#6aaa30 0%,#5a9a20 100%);color:#fff;box-shadow:0 2px 0 #3a7010,0 4px 10px rgba(80,140,20,.2)}
+.btn-primary:active{box-shadow:0 1px 0 #3a7010}
 .btn-accent{background:linear-gradient(135deg,#d4956a 0%,#c9874a 100%);color:#fff8f0;box-shadow:0 2px 0 #a06030,0 4px 10px rgba(180,100,40,.15)}
 .btn-accent:active{box-shadow:0 1px 0 #a06030}
-.btn-danger{background:linear-gradient(135deg,#d07070 0%,#c26060 100%);color:#fff;box-shadow:0 2px 0 #903030}
-.btn-danger:active{box-shadow:0 1px 0 #903030}
+.btn-danger{background:linear-gradient(135deg,#e8603a 0%,#d44a20 100%);color:#fff;box-shadow:0 2px 0 #a03010}
+.btn-danger:active{box-shadow:0 1px 0 #922020}
 .btn-outline{background:rgba(255,252,245,.8);border:1.5px solid var(--border);color:var(--text-sub)}
 .btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
 .btn-block{width:100%}
@@ -505,8 +505,8 @@ tr:last-child td{border-bottom:none}
   .no-print{display:none!important}
   .print-only{display:inline!important;font-size:15px!important;font-weight:400!important;color:#000!important}
 
-  /* 金額：右揃え・折り返しなし */
-  .col-amount{text-align:right!important;white-space:nowrap!important}
+  /* 金額：左揃え・折り返しなし */
+  .col-amount{text-align:left!important;white-space:nowrap!important}
   .amount{text-align:right!important;white-space:nowrap!important;font-variant-numeric:tabular-nums!important;font-size:16px!important}
   .amount.negative{color:#c00!important}
 
@@ -619,8 +619,8 @@ tr:last-child td{border-bottom:none}
             </colgroup>
             <thead><tr>
               <th>月日</th><th>支払先</th><th>用途</th>
-              <th class="col-amount" style="text-align:right">金額</th><th>請求</th><th>備考</th>
-              <th class="no-print">操作</th>
+              <th class="col-amount" style="text-align:left">金額</th><th>請求</th><th>備考</th>
+              <th class="no-print">編集</th>
             </tr></thead>
             <tbody id="report-tbody"></tbody>
           </table>
@@ -742,9 +742,9 @@ tr:last-child td{border-bottom:none}
               <th style="white-space:nowrap">月日</th>
               <th>支払先</th>
               <th>用途</th>
-              <th class="amount">金額</th>
+              <th style="text-align:left">金額</th>
               <th>方法</th>
-              <th style="width:52px"></th>
+              <th style="width:40px;text-align:center">編集</th>
             </tr></thead>
             <tbody id="special-tbody"></tbody>
           </table>
@@ -989,13 +989,13 @@ tr:last-child td{border-bottom:none}
     </div>
     <!-- ボタン行 -->
     <div style="display:none;gap:8px" id="sp2-btn-row-edit">
-      <button id="sp2-delete-btn" onclick="deleteSpecialRowFromModal()" style="padding:10px 4px;border-radius:12px;border:1.5px solid rgba(192,112,96,.4);background:none;font-size:13px;font-weight:600;color:#c07060;cursor:pointer">🗑削除</button>
+      <button id="sp2-delete-btn" onclick="deleteSpecialRowFromModal()" style="padding:10px 4px;border-radius:12px;border:none;background:linear-gradient(135deg,#e8603a 0%,#d44a20 100%);color:#fff;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 0 #a03010">🗑削除</button>
       <button onclick="closeSpecialAddModal()" style="padding:10px;border-radius:12px;background:#e8ddd0;border:none;font-size:14px;font-weight:600;color:#5a4030;cursor:pointer">キャンセル</button>
-      <button onclick="saveSpecialRow()" style="padding:10px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:700;cursor:pointer">保存</button>
+      <button onclick="saveSpecialRow()" style="padding:10px;border-radius:12px;border:none;background:linear-gradient(135deg,#6aaa30 0%,#5a9a20 100%);color:#fff;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 2px 0 #3a7010">保存</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="sp2-btn-row-add">
       <button onclick="closeSpecialAddModal()" style="padding:10px;border-radius:12px;background:#e8ddd0;border:none;font-size:14px;font-weight:600;color:#5a4030;cursor:pointer">キャンセル</button>
-      <button onclick="saveSpecialRow()" style="padding:10px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:700;cursor:pointer">保存</button>
+      <button onclick="saveSpecialRow()" style="padding:10px;border-radius:12px;border:none;background:linear-gradient(135deg,#6aaa30 0%,#5a9a20 100%);color:#fff;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 2px 0 #3a7010">保存</button>
     </div>
   </div>
 </div>
@@ -1261,6 +1261,24 @@ function calcBilling(list){
   const a100=list.filter(e=>(e.ratio_pct||50)===100).reduce((s,e)=>s+Number(e.amount||0),0);
   return{a50,a100,billing:Math.round(a50*0.5)+a100};
 }
+// ── 汎用確認モーダル ──
+let _confirmAction = null;
+function openConfirmModal(msg){
+  document.getElementById('confirm-modal-msg').textContent = msg;
+  const m = document.getElementById('confirm-modal');
+  m.style.display = 'flex'; m.style.pointerEvents = 'auto';
+}
+function closeConfirmModal(){
+  const m = document.getElementById('confirm-modal');
+  m.style.display = 'none'; m.style.pointerEvents = 'none';
+  _confirmAction = null;
+}
+function execConfirmModal(){
+  const action = _confirmAction;
+  closeConfirmModal();
+  if(action) action();
+}
+
 function showToast(msg){
   const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2200);
@@ -1351,10 +1369,10 @@ function renderSpecialTab(){
       <td style="font-size:12px;white-space:nowrap">${formatSpecialDate(r.mmdd)}</td>
       <td style="font-size:12px">${esc(r.payee)}</td>
       <td style="font-size:11px;color:#7a5c3a">${esc(r.purpose)}</td>
-      <td class="amount" style="font-size:12px;white-space:nowrap">${r.amount?'¥'+Number(r.amount).toLocaleString():'-'}</td>
+      <td style="font-size:12px;white-space:nowrap">${r.amount?'¥'+Number(r.amount).toLocaleString():'-'}</td>
       <td style="font-size:11px;color:#7a5c3a">${esc(r.method)}</td>
       <td style="text-align:center">
-        <button onclick="openSpecialEditModal('${r.id}')" style="background:none;border:none;cursor:pointer;color:#8a9a6a;font-size:14px;padding:1px 2px" title="編集">✎</button>
+        <button onclick="openSpecialEditModal('${r.id}')" style="background:none;border:none;cursor:pointer;font-size:16px;padding:1px 2px" title="編集">✏️</button>
       </td>
     </tr>
   `).join('');
@@ -1381,19 +1399,23 @@ function copyPrevYear(){
   const all = loadSpecial();
   const prevRows = all.filter(r=>r.year===prevYear);
   if(prevRows.length===0){showToast(`${prevYear}年のデータがありません`);return;}
-  const alreadyExists = all.some(r=>r.year===_spYear);
-  if(alreadyExists){
-    if(!confirm(`${_spYear}年にすでにデータがあります。前年（${prevYear}年）分を追加コピーしますか？`))return;
+  const doCopy = ()=>{
+    const latest = loadSpecial();
+    const copies = prevRows.map(r=>({
+      ...r,
+      id: Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+      year: _spYear
+    }));
+    saveSpecial([...latest, ...copies]);
+    renderSpecialTab();
+    showToast(`✓ ${prevYear}年→${_spYear}年へ${copies.length}件追加しました`);
+  };
+  if(all.some(r=>r.year===_spYear)){
+    _confirmAction = doCopy;
+    openConfirmModal(`${_spYear}年にデータがあります。前年分を追加コピーしますか？`);
+  } else {
+    doCopy();
   }
-  const copies = prevRows.map(r=>({
-    ...r,
-    id: Date.now().toString(36)+Math.random().toString(36).slice(2,5)+'_'+r.id.slice(-3),
-    year: _spYear,
-    amount: '' // 金額はリセット（要確認）
-  }));
-  saveSpecial([...all, ...copies]);
-  renderSpecialTab();
-  showToast(`✓ ${prevYear}年→${_spYear}年へ${copies.length}件コピーしました`);
 }
 
 // ── 日付テンキー ──
@@ -1845,9 +1867,11 @@ function renderSettings(){
   }).join('');
 }
 function confirmDeletePeriodic(id){
-  if(!confirm('この定期支払いを削除しますか？'))return;
-  periodics=periodics.filter(p=>p.id!==id);
-  sv(SK.periodic,periodics);showToast('🗑 削除しました');renderSettings();
+  _confirmAction = ()=>{
+    periodics=periodics.filter(p=>p.id!==id);
+    sv(SK.periodic,periodics);showToast('🗑 削除しました');renderSettings();
+  };
+  openConfirmModal('定期支払いを削除しますか？');
 }
 function addPeriodic(){
   const payee=document.getElementById('sp-payee').value.trim();
@@ -1893,9 +1917,11 @@ function savePeriodicEdit(){
 }
 function deletePeriodicFromModal(){
   const id=document.getElementById('pedit-id').value;
-  if(!confirm('この定期支払いを削除しますか？'))return;
-  periodics=periodics.filter(p=>p.id!==id);
-  sv(SK.periodic,periodics);closePeriodicEditModal();showToast('🗑 削除しました');renderSettings();
+  _confirmAction = ()=>{
+    periodics=periodics.filter(p=>p.id!==id);
+    sv(SK.periodic,periodics);closePeriodicEditModal();showToast('🗑 削除しました');renderSettings();
+  };
+  openConfirmModal('この定期支払いを削除しますか？');
 }
 
 // ── YEARLY ──
@@ -1991,17 +2017,16 @@ function handleImport(e){
       e.target.value='';
       return;
     }
-    if(!confirm('現在のデータを読み込んだファイルで上書きします。よろしいですか？')){
+    _confirmAction = ()=>{
+      if(data.entries)entries=data.entries;
+      if(data.periodics)periodics=data.periodics;
+      if(data.yearlyMemos)yearlyMemos=data.yearlyMemos;
+      sv(SK.entries,entries);sv(SK.periodic,periodics);sv(SK.memos,yearlyMemos);
+      showToast('✓ データを読み込みました');
+      switchTab(currentTab);
       e.target.value='';
-      return;
-    }
-    if(data.entries)entries=data.entries;
-    if(data.periodics)periodics=data.periodics;
-    if(data.yearlyMemos)yearlyMemos=data.yearlyMemos;
-    sv(SK.entries,entries);sv(SK.periodic,periodics);sv(SK.memos,yearlyMemos);
-    showToast('✓ データを読み込みました');
-    switchTab(currentTab);
-    e.target.value='';
+    };
+    openConfirmModal('現在のデータを上書きします。よろしいですか？');
   };
   reader.onerror=()=>{showToast('⚠ ファイルの読み込みに失敗しました');e.target.value='';};
   reader.readAsText(file,'UTF-8');
@@ -2063,6 +2088,17 @@ function installPWA(){
 
 </script>
 
+<!-- 汎用確認モーダル -->
+<div id="confirm-modal" style="display:none;pointer-events:none;position:fixed;inset:0;background:rgba(80,50,30,.5);z-index:800;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
+  <div style="background:linear-gradient(160deg,#fdf6ec 0%,#f7ede0 100%);border-radius:18px;padding:24px 20px 20px;width:calc(100% - 60px);max-width:300px;box-shadow:0 12px 50px rgba(80,40,20,.3);border:1px solid rgba(200,160,120,.25);animation:fadeScaleIn .18s ease;text-align:center">
+    <div style="font-size:15px;font-weight:700;color:var(--accent);margin-bottom:12px" id="confirm-modal-msg"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button onclick="closeConfirmModal()" style="padding:11px;border-radius:12px;background:#e8ddd0;border:none;font-size:14px;font-weight:600;color:#5a4030;cursor:pointer">キャンセル</button>
+      <button onclick="execConfirmModal()" style="padding:11px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:700;cursor:pointer">実行する</button>
+    </div>
+  </div>
+</div>
+
 <!-- 支払い削除 確認モーダル -->
 <div id="entry-delete-confirm-modal" style="display:none;pointer-events:none;position:fixed;inset:0;background:rgba(80,50,30,.5);z-index:700;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
   <div style="background:linear-gradient(160deg,#fdf6ec 0%,#f7ede0 100%);border-radius:18px;padding:24px 20px 20px;width:calc(100% - 60px);max-width:300px;box-shadow:0 12px 50px rgba(80,40,20,.3);border:1px solid rgba(200,160,120,.25);animation:fadeScaleIn .18s ease;text-align:center">
@@ -2071,7 +2107,7 @@ function installPWA(){
     <div style="font-size:13px;color:#8a6a4a;margin-bottom:20px">この支払いを削除しますか？<br>削除後は元に戻せません。</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <button onclick="closeEntryDeleteConfirm()" style="padding:11px;border-radius:12px;background:#e8ddd0;border:none;font-size:14px;font-weight:600;color:#5a4030;cursor:pointer">キャンセル</button>
-      <button onclick="execEntryDelete()" style="padding:11px;border-radius:12px;border:none;background:#c07060;color:#fff;font-size:14px;font-weight:700;cursor:pointer">削除する</button>
+      <button onclick="execEntryDelete()" style="padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#e8603a 0%,#d44a20 100%);color:#fff;font-size:14px;font-weight:700;cursor:pointer">削除する</button>
     </div>
   </div>
 </div>
@@ -2084,7 +2120,7 @@ function installPWA(){
     <div style="font-size:13px;color:#8a6a4a;margin-bottom:20px">この行を削除しますか？<br>削除後は元に戻せません。</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <button onclick="closeSpDeleteConfirm()" style="padding:11px;border-radius:12px;background:#e8ddd0;border:none;font-size:14px;font-weight:600;color:#5a4030;cursor:pointer">キャンセル</button>
-      <button onclick="execSpecialDelete()" style="padding:11px;border-radius:12px;border:none;background:#c07060;color:#fff;font-size:14px;font-weight:700;cursor:pointer">削除する</button>
+      <button onclick="execSpecialDelete()" style="padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#e8603a 0%,#d44a20 100%);color:#fff;font-size:14px;font-weight:700;cursor:pointer">削除する</button>
     </div>
   </div>
 </div>

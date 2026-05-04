@@ -886,9 +886,10 @@ tr:last-child td{border-bottom:none}
           </div>
         </div>
       </div>
-      <div class="btn-row">
-        <button class="btn btn-primary btn-block" onclick="saveEdit()">保存する</button>
-        <button class="btn btn-danger" onclick="deleteEntry(document.getElementById('edit-id').value)">削除</button>
+      <div class="btn-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+        <button class="btn btn-danger" onclick="openEntryDeleteConfirm()">🗑削除</button>
+        <button class="btn" style="background:#e8ddd0;border:none;color:#5a4030" onclick="closeEditModal()">キャンセル</button>
+        <button class="btn btn-primary" onclick="saveEdit()">保存</button>
       </div>
     </div>
   </div>
@@ -989,11 +990,11 @@ tr:last-child td{border-bottom:none}
     <!-- ボタン行 -->
     <div style="display:none;gap:8px" id="sp2-btn-row-edit">
       <button id="sp2-delete-btn" onclick="deleteSpecialRowFromModal()" style="padding:10px 4px;border-radius:12px;border:1.5px solid rgba(192,112,96,.4);background:none;font-size:13px;font-weight:600;color:#c07060;cursor:pointer">🗑削除</button>
-      <button onclick="closeSpecialAddModal()" style="padding:10px;border-radius:12px;border:1.5px solid rgba(160,120,80,.3);background:none;font-size:14px;font-weight:600;color:#8a6a4a;cursor:pointer">キャンセル</button>
+      <button onclick="closeSpecialAddModal()" style="padding:10px;border-radius:12px;background:#e8ddd0;border:none;font-size:14px;font-weight:600;color:#5a4030;cursor:pointer">キャンセル</button>
       <button onclick="saveSpecialRow()" style="padding:10px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:700;cursor:pointer">保存</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="sp2-btn-row-add">
-      <button onclick="closeSpecialAddModal()" style="padding:10px;border-radius:12px;border:1.5px solid rgba(160,120,80,.3);background:none;font-size:14px;font-weight:600;color:#8a6a4a;cursor:pointer">キャンセル</button>
+      <button onclick="closeSpecialAddModal()" style="padding:10px;border-radius:12px;background:#e8ddd0;border:none;font-size:14px;font-weight:600;color:#5a4030;cursor:pointer">キャンセル</button>
       <button onclick="saveSpecialRow()" style="padding:10px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:700;cursor:pointer">保存</button>
     </div>
   </div>
@@ -1541,6 +1542,17 @@ function openSpecialEditModal(id){
 function deleteSpecialRowFromModal(){
   const id = document.getElementById('sp2-edit-id').value;
   if(!id){ showToast('削除対象がありません'); return; }
+  // 確認モーダルを表示
+  const m = document.getElementById('sp-delete-confirm-modal');
+  m.style.display = 'flex'; m.style.pointerEvents = 'auto';
+}
+function closeSpDeleteConfirm(){
+  const m = document.getElementById('sp-delete-confirm-modal');
+  m.style.display = 'none'; m.style.pointerEvents = 'none';
+}
+function execSpecialDelete(){
+  const id = document.getElementById('sp2-edit-id').value;
+  closeSpDeleteConfirm();
   saveSpecial(loadSpecial().filter(r=>r.id!==id));
   closeSpecialAddModal();
   renderSpecialTab();
@@ -1796,8 +1808,21 @@ function saveEdit(){
   entries[idx]={id,date:document.getElementById('edit-date').value,amount:Number(document.getElementById('edit-amount').value)||0,payee:document.getElementById('edit-payee').value.trim(),purpose:document.getElementById('edit-purpose').value.trim(),note:document.getElementById('edit-note').value.trim(),ratio_pct:currentEditRatio};
   sv(SK.entries,entries);closeEditModal();showToast('✓ 更新しました');renderReport();
 }
+function openEntryDeleteConfirm(){
+  const m = document.getElementById('entry-delete-confirm-modal');
+  m.style.display = 'flex'; m.style.pointerEvents = 'auto';
+}
+function closeEntryDeleteConfirm(){
+  const m = document.getElementById('entry-delete-confirm-modal');
+  m.style.display = 'none'; m.style.pointerEvents = 'none';
+}
+function execEntryDelete(){
+  const id = document.getElementById('edit-id').value;
+  closeEntryDeleteConfirm();
+  entries = entries.filter(x=>x.id!==id);
+  sv(SK.entries,entries); closeEditModal(); showToast('🗑 削除しました'); renderReport();
+}
 function deleteEntry(id){
-  if(!confirm('この支払いを削除しますか？'))return;
   entries=entries.filter(x=>x.id!==id);
   sv(SK.entries,entries);closeEditModal();showToast('🗑 削除しました');renderReport();
 }
@@ -2036,7 +2061,33 @@ function installPWA(){
   _installPrompt.userChoice.then(()=>{_installPrompt=null;});
 }
 
-// ── INIT ──
 </script>
+
+<!-- 支払い削除 確認モーダル -->
+<div id="entry-delete-confirm-modal" style="display:none;pointer-events:none;position:fixed;inset:0;background:rgba(80,50,30,.5);z-index:700;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
+  <div style="background:linear-gradient(160deg,#fdf6ec 0%,#f7ede0 100%);border-radius:18px;padding:24px 20px 20px;width:calc(100% - 60px);max-width:300px;box-shadow:0 12px 50px rgba(80,40,20,.3);border:1px solid rgba(200,160,120,.25);animation:fadeScaleIn .18s ease;text-align:center">
+    <div style="font-size:28px;margin-bottom:10px">🗑</div>
+    <div style="font-size:15px;font-weight:700;color:var(--accent);margin-bottom:6px">削除の確認</div>
+    <div style="font-size:13px;color:#8a6a4a;margin-bottom:20px">この支払いを削除しますか？<br>削除後は元に戻せません。</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button onclick="closeEntryDeleteConfirm()" style="padding:11px;border-radius:12px;background:#e8ddd0;border:none;font-size:14px;font-weight:600;color:#5a4030;cursor:pointer">キャンセル</button>
+      <button onclick="execEntryDelete()" style="padding:11px;border-radius:12px;border:none;background:#c07060;color:#fff;font-size:14px;font-weight:700;cursor:pointer">削除する</button>
+    </div>
+  </div>
+</div>
+
+<!-- 特別削除 確認モーダル -->
+<div id="sp-delete-confirm-modal" style="display:none;pointer-events:none;position:fixed;inset:0;background:rgba(80,50,30,.5);z-index:700;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
+  <div style="background:linear-gradient(160deg,#fdf6ec 0%,#f7ede0 100%);border-radius:18px;padding:24px 20px 20px;width:calc(100% - 60px);max-width:300px;box-shadow:0 12px 50px rgba(80,40,20,.3);border:1px solid rgba(200,160,120,.25);animation:fadeScaleIn .18s ease;text-align:center">
+    <div style="font-size:28px;margin-bottom:10px">🗑</div>
+    <div style="font-size:15px;font-weight:700;color:var(--accent);margin-bottom:6px">削除の確認</div>
+    <div style="font-size:13px;color:#8a6a4a;margin-bottom:20px">この行を削除しますか？<br>削除後は元に戻せません。</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button onclick="closeSpDeleteConfirm()" style="padding:11px;border-radius:12px;background:#e8ddd0;border:none;font-size:14px;font-weight:600;color:#5a4030;cursor:pointer">キャンセル</button>
+      <button onclick="execSpecialDelete()" style="padding:11px;border-radius:12px;border:none;background:#c07060;color:#fff;font-size:14px;font-weight:700;cursor:pointer">削除する</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

@@ -723,7 +723,9 @@ tr:last-child td{border-bottom:none}
       <div class="card-body">
         <!-- 年ナビ + 追加ボタン -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div style="flex:1"></div>
+          <div style="flex:1">
+            <button onclick="copyPrevYear()" style="background:rgba(160,120,80,.15);color:var(--accent);border:1.5px solid rgba(160,120,80,.3);border-radius:10px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">前年全コピー</button>
+          </div>
           <div style="display:flex;align-items:center;gap:6px">
             <button class="hbtn" style="min-width:32px;padding:5px 7px;font-size:16px;color:#fdf0e0;background:rgba(160,120,80,.55);border-color:rgba(160,120,80,.4)" onclick="specialYearMove(-1)">‹</button>
             <span id="special-year-label" style="font-size:16px;font-weight:700;color:var(--accent);min-width:72px;text-align:center"></span>
@@ -962,11 +964,13 @@ tr:last-child td{border-bottom:none}
   <div style="background:var(--card);border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;max-width:520px;box-shadow:0 -4px 24px rgba(0,0,0,.2)">
     <div id="sp2-modal-title" style="font-weight:700;font-size:16px;color:var(--accent);margin-bottom:16px;text-align:center">特別支払い　追加</div>
     <input type="hidden" id="sp2-edit-id">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-      <div><label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">年</label>
-        <input type="number" id="sp2-year" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box" min="2020" max="2099"></div>
-      <div><label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">月日（MM-DD）</label>
-        <input type="text" id="sp2-mmdd" placeholder="01-15" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box"></div>
+    <!-- 年月日（テンキー） -->
+    <div style="margin-bottom:10px">
+      <label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">年月日</label>
+      <div class="amount-input-display" id="sp2-date-display" onclick="openSpDateTenkey()" style="cursor:pointer">
+        <span id="sp2-date-display-text" class="placeholder">例：2026-01-27</span>
+      </div>
+      <input type="hidden" id="sp2-date-val">
     </div>
     <div style="margin-bottom:10px"><label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">支払先</label>
       <input type="text" id="sp2-payee" placeholder="例：三井住友海上" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box"></div>
@@ -978,12 +982,43 @@ tr:last-child td{border-bottom:none}
       <div><label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">支払方法</label>
         <input type="text" id="sp2-method" placeholder="例：現金" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box"></div>
     </div>
-    <div id="sp2-delete-row" style="display:none;margin-bottom:10px">
-      <button onclick="deleteSpecialRowFromModal()" style="width:100%;padding:11px;border-radius:12px;border:1.5px solid rgba(192,112,96,.4);background:none;font-size:14px;font-weight:600;color:#c07060;cursor:pointer">🗑　この行を削除</button>
+    <!-- ボタン行：削除(編集時のみ) | キャンセル | 保存 -->
+    <div style="display:none;gap:8px" id="sp2-btn-row-edit">
+      <button id="sp2-delete-btn" onclick="deleteSpecialRowFromModal()" style="padding:12px 4px;border-radius:12px;border:1.5px solid rgba(192,112,96,.4);background:none;font-size:14px;font-weight:600;color:#c07060;cursor:pointer">🗑削除</button>
+      <button onclick="closeSpecialAddModal()" id="sp2-cancel-btn" style="padding:12px;border-radius:12px;border:1.5px solid rgba(160,120,80,.3);background:none;font-size:15px;font-weight:600;color:#8a6a4a;cursor:pointer">キャンセル</button>
+      <button onclick="saveSpecialRow()" style="padding:12px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:700;cursor:pointer">保存</button>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="sp2-btn-row-add">
       <button onclick="closeSpecialAddModal()" style="padding:12px;border-radius:12px;border:1.5px solid rgba(160,120,80,.3);background:none;font-size:15px;font-weight:600;color:#8a6a4a;cursor:pointer">キャンセル</button>
       <button onclick="saveSpecialRow()" style="padding:12px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:700;cursor:pointer">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 特別支払い 日付テンキー -->
+<div id="sp-date-tenkey-modal" style="display:none;pointer-events:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;align-items:flex-end;justify-content:center">
+  <div style="background:var(--card);border-radius:20px 20px 0 0;padding:16px 16px 28px;width:100%;max-width:520px">
+    <div style="font-size:13px;color:#8a6a4a;text-align:center;margin-bottom:12px">日付を選択</div>
+    <!-- 年月ナビ -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">
+      <button onclick="spCalMove(-1)" style="background:none;border:none;font-size:22px;color:var(--accent);cursor:pointer;padding:2px 8px">‹</button>
+      <span id="sp-cal-label" style="font-size:16px;font-weight:700;color:var(--accent);min-width:100px;text-align:center"></span>
+      <button onclick="spCalMove(1)" style="background:none;border:none;font-size:22px;color:var(--accent);cursor:pointer;padding:2px 8px">›</button>
+    </div>
+    <!-- 曜日ヘッダ -->
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px">
+      <div style="text-align:center;font-size:11px;font-weight:700;color:#c07060">日</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:#7a5c3a">月</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:#7a5c3a">火</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:#7a5c3a">水</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:#7a5c3a">木</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:#7a5c3a">金</div>
+      <div style="text-align:center;font-size:11px;font-weight:700;color:#6080c0">土</div>
+    </div>
+    <!-- 日グリッド -->
+    <div id="sp-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:14px"></div>
+    <div class="tkey-action-row">
+      <button class="tkey-cancel" onclick="closeSpDateTenkey()">キャンセル</button>
     </div>
   </div>
 </div>
@@ -1271,8 +1306,6 @@ let _spYear = 2026;
 
 function renderSpecialTab(){
   const all = loadSpecial();
-  const years = [...new Set([...all.map(r=>r.year), new Date().getFullYear()])].sort((a,b)=>a-b);
-  if(!years.includes(_spYear)) _spYear = years[years.length-1];
   document.getElementById('special-year-label').textContent = `${_spYear}年`;
 
   const rows = all.filter(r=>r.year===_spYear).sort((a,b)=>(a.mmdd||'99-99').localeCompare(b.mmdd||'99-99'));
@@ -1306,53 +1339,141 @@ function formatSpecialDate(mmdd){
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function specialYearMove(dir){
-  const all = loadSpecial();
-  const years = [...new Set([...all.map(r=>r.year), new Date().getFullYear()])].sort((a,b)=>a-b);
-  const idx = years.indexOf(_spYear);
-  const next = idx + dir;
-  if(next >= 0 && next < years.length){ _spYear = years[next]; renderSpecialTab(); }
-}
-
-function deleteSpecialRow(id){
-  if(!confirm('この行を削除しますか？')) return;
-  saveSpecial(loadSpecial().filter(r=>r.id!==id));
+  // データにない年でも ±1 で移動できるよう上限なし
+  _spYear += dir;
   renderSpecialTab();
 }
 
+// 前年全コピー
+function copyPrevYear(){
+  const prevYear = _spYear - 1;
+  const all = loadSpecial();
+  const prevRows = all.filter(r=>r.year===prevYear);
+  if(prevRows.length===0){showToast(`${prevYear}年のデータがありません`);return;}
+  const alreadyExists = all.some(r=>r.year===_spYear);
+  if(alreadyExists){
+    if(!confirm(`${_spYear}年にすでにデータがあります。前年（${prevYear}年）分を追加コピーしますか？`))return;
+  }
+  const copies = prevRows.map(r=>({
+    ...r,
+    id: Date.now().toString(36)+Math.random().toString(36).slice(2,5)+'_'+r.id.slice(-3),
+    year: _spYear,
+    amount: '' // 金額はリセット（要確認）
+  }));
+  saveSpecial([...all, ...copies]);
+  renderSpecialTab();
+  showToast(`✓ ${prevYear}年→${_spYear}年へ${copies.length}件コピーしました`);
+}
+
+// ── 日付テンキー ──
+// ── カレンダー日付選択 ──
+let _spCalYear = 2026, _spCalMonth = 1;
+
+function openSpDateTenkey(){
+  const cur = document.getElementById('sp2-date-val').value;
+  if(cur && cur.length>=8){
+    const p = cur.split('-');
+    _spCalYear = parseInt(p[0]); _spCalMonth = parseInt(p[1]);
+  } else {
+    const now = new Date();
+    _spCalYear = _spYear || now.getFullYear();
+    _spCalMonth = now.getMonth()+1;
+  }
+  _spCalRender();
+  document.getElementById('special-add-modal').style.display = 'none';
+  const tk = document.getElementById('sp-date-tenkey-modal');
+  tk.style.display = 'flex'; tk.style.pointerEvents = 'auto';
+}
+function closeSpDateTenkey(){
+  const tk = document.getElementById('sp-date-tenkey-modal');
+  tk.style.display = 'none'; tk.style.pointerEvents = 'none';
+  document.getElementById('special-add-modal').style.display = 'flex';
+}
+function spCalMove(dir){
+  _spCalMonth += dir;
+  if(_spCalMonth>12){_spCalMonth=1;_spCalYear++;}
+  if(_spCalMonth<1){_spCalMonth=12;_spCalYear--;}
+  _spCalRender();
+}
+function _spCalRender(){
+  document.getElementById('sp-cal-label').textContent = `${_spCalYear}年 ${_spCalMonth}月`;
+  const firstDay = new Date(_spCalYear, _spCalMonth-1, 1).getDay();
+  const daysInMonth = new Date(_spCalYear, _spCalMonth, 0).getDate();
+  const cur = document.getElementById('sp2-date-val').value;
+  const selD = cur ? parseInt(cur.split('-')[2]) : -1;
+  const selY = cur ? parseInt(cur.split('-')[0]) : -1;
+  const selM = cur ? parseInt(cur.split('-')[1]) : -1;
+  let html = '';
+  for(let i=0;i<firstDay;i++) html+=`<div></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const isSel = selY===_spCalYear&&selM===_spCalMonth&&selD===d;
+    const dow = (firstDay+d-1)%7;
+    const col = dow===0?'#c07060':dow===6?'#6080c0':'var(--text)';
+    const bg  = isSel?'var(--accent)':'var(--surface)';
+    const fc  = isSel?'#fff':col;
+    html+=`<button onclick="spCalSelect(${d})" style="border:none;border-radius:8px;padding:7px 2px;font-size:14px;font-weight:${isSel?'700':'400'};background:${bg};color:${fc};cursor:pointer">${d}</button>`;
+  }
+  document.getElementById('sp-cal-grid').innerHTML = html;
+}
+function spCalSelect(d){
+  const mm = String(_spCalMonth).padStart(2,'0');
+  const dd = String(d).padStart(2,'0');
+  document.getElementById('sp2-date-val').value = `${_spCalYear}-${mm}-${dd}`;
+  const el = document.getElementById('sp2-date-display-text');
+  el.textContent = `${_spCalYear}/${_spCalMonth}/${d}`;
+  el.classList.remove('placeholder');
+  closeSpDateTenkey();
+}
+
 // ── 追加・編集モーダル ──
+function _spModalMode(isEdit){
+  const editRow = document.getElementById('sp2-btn-row-edit');
+  const addRow  = document.getElementById('sp2-btn-row-add');
+  if(isEdit){
+    editRow.style.display = 'grid';
+    editRow.style.gridTemplateColumns = '1fr 1fr 1fr';
+    addRow.style.display = 'none';
+  } else {
+    editRow.style.display = 'none';
+    addRow.style.display = 'grid';
+    addRow.style.gridTemplateColumns = '1fr 1fr';
+  }
+}
 function openSpecialAddModal(){
   const now = new Date();
-  const m = document.getElementById('special-add-modal');
-  m.querySelector('#sp2-modal-title').textContent = '特別支払い　追加';
-  m.querySelector('#sp2-edit-id').value = '';
-  m.querySelector('#sp2-year').value = _spYear;
-  m.querySelector('#sp2-mmdd').value = `${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-  m.querySelector('#sp2-payee').value = '';
-  m.querySelector('#sp2-purpose').value = '';
-  m.querySelector('#sp2-amount').value = '';
-  m.querySelector('#sp2-method').value = '現金';
-  m.querySelector('#sp2-delete-row').style.display = 'none';
-  m.style.display = 'flex';
+  document.getElementById('sp2-modal-title').textContent = '特別支払い　追加';
+  document.getElementById('sp2-edit-id').value = '';
+  document.getElementById('sp2-payee').value = '';
+  document.getElementById('sp2-purpose').value = '';
+  document.getElementById('sp2-amount').value = '';
+  document.getElementById('sp2-method').value = '現金';
+  document.getElementById('sp2-date-val').value = '';
+  const el = document.getElementById('sp2-date-display-text');
+  el.textContent = '例：2026-01-27'; el.classList.add('placeholder');
+  _spModalMode(false);
+  document.getElementById('special-add-modal').style.display = 'flex';
 }
 function openSpecialEditModal(id){
   const row = loadSpecial().find(r=>r.id===id);
   if(!row) return;
-  const m = document.getElementById('special-add-modal');
-  m.querySelector('#sp2-modal-title').textContent = '特別支払い　編集';
-  m.querySelector('#sp2-edit-id').value = id;
-  m.querySelector('#sp2-year').value = row.year;
-  m.querySelector('#sp2-mmdd').value = row.mmdd || '';
-  m.querySelector('#sp2-payee').value = row.payee || '';
-  m.querySelector('#sp2-purpose').value = row.purpose || '';
-  m.querySelector('#sp2-amount').value = row.amount || '';
-  m.querySelector('#sp2-method').value = row.method || '';
-  m.querySelector('#sp2-delete-row').style.display = 'block';
-  m.style.display = 'flex';
+  document.getElementById('sp2-modal-title').textContent = '特別支払い　編集';
+  document.getElementById('sp2-edit-id').value = id;
+  document.getElementById('sp2-payee').value = row.payee || '';
+  document.getElementById('sp2-purpose').value = row.purpose || '';
+  document.getElementById('sp2-amount').value = row.amount || '';
+  document.getElementById('sp2-method').value = row.method || '';
+  // 日付復元
+  const dateVal = row.year && row.mmdd ? `${row.year}-${row.mmdd}` : '';
+  document.getElementById('sp2-date-val').value = dateVal;
+  const el = document.getElementById('sp2-date-display-text');
+  if(dateVal){ el.textContent = dateVal; el.classList.remove('placeholder'); }
+  else { el.textContent = '例：2026-01-27'; el.classList.add('placeholder'); }
+  _spModalMode(true);
+  document.getElementById('special-add-modal').style.display = 'flex';
 }
 function deleteSpecialRowFromModal(){
   const id = document.getElementById('sp2-edit-id').value;
-  if(!id) return;
-  if(!confirm('この行を削除しますか？')) return;
+  if(!id){ showToast('削除対象がありません'); return; }
   saveSpecial(loadSpecial().filter(r=>r.id!==id));
   closeSpecialAddModal();
   renderSpecialTab();
@@ -1360,16 +1481,24 @@ function deleteSpecialRowFromModal(){
 }
 function closeSpecialAddModal(){
   document.getElementById('special-add-modal').style.display = 'none';
+  document.getElementById('sp-date-tenkey-modal').style.display = 'none';
 }
 function saveSpecialRow(){
-  const m = document.getElementById('special-add-modal');
-  const editId = m.querySelector('#sp2-edit-id').value;
-  const year   = parseInt(m.querySelector('#sp2-year').value)||new Date().getFullYear();
-  const mmdd   = m.querySelector('#sp2-mmdd').value.trim();
-  const payee  = m.querySelector('#sp2-payee').value.trim();
-  const purpose= m.querySelector('#sp2-purpose').value.trim();
-  const amount = m.querySelector('#sp2-amount').value.replace(/[^\d]/g,'');
-  const method = m.querySelector('#sp2-method').value.trim();
+  const editId  = document.getElementById('sp2-edit-id').value;
+  const dateVal = document.getElementById('sp2-date-val').value; // YYYY-MM-DD or ''
+  let year, mmdd;
+  if(dateVal && dateVal.length>=8){
+    const parts = dateVal.split('-');
+    year = parseInt(parts[0]);
+    mmdd = `${parts[1]}-${parts[2]}`;
+  } else {
+    year = _spYear;
+    mmdd = '';
+  }
+  const payee   = document.getElementById('sp2-payee').value.trim();
+  const purpose = document.getElementById('sp2-purpose').value.trim();
+  const amount  = document.getElementById('sp2-amount').value.replace(/[^\d]/g,'');
+  const method  = document.getElementById('sp2-method').value.trim();
   if(!payee){alert('支払先を入力してください');return;}
   let data = loadSpecial();
   if(editId){
@@ -1410,30 +1539,30 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('periodic-edit-modal').addEventListener('click',function(e){if(e.target===this)closePeriodicEditModal()});
   document.getElementById('special-add-modal').addEventListener('click',function(e){if(e.target===this)closeSpecialAddModal()});
 
-  // ── スワイプでタブ切替 ──
+  // ── スワイプでタブ切替（#mainのみ・縦スクロール優先）──
   const TABS = ['input','report','yearly','special','settings'];
-  let _sx=null,_sy=null,_cancelled=false;
-  document.addEventListener('touchstart',e=>{
+  const mainEl = document.getElementById('main');
+  let _sx=null,_sy=null,_swOk=false;
+  mainEl.addEventListener('touchstart',e=>{
     const tag=e.target.tagName;
     if(tag==='INPUT'||tag==='SELECT'||tag==='BUTTON'||tag==='TEXTAREA'){_sx=null;return;}
-    // モーダルが開いていたら無視
-    if(document.querySelector('[style*="display: flex"][id$="-modal"],[style*="display:flex"][id$="-modal"]')){_sx=null;return;}
-    _sx=e.touches[0].clientX;
-    _sy=e.touches[0].clientY;
-    _cancelled=false;
+    _sx=e.touches[0].clientX; _sy=e.touches[0].clientY; _swOk=false;
   },{passive:true});
-  document.addEventListener('touchmove',e=>{
-    if(_sx===null||_cancelled)return;
-    const dx=Math.abs(e.touches[0].clientX-_sx);
-    const dy=Math.abs(e.touches[0].clientY-_sy);
-    if(dy>8){_cancelled=true;} // 縦が先に動いたらスワイプキャンセル
+  mainEl.addEventListener('touchmove',e=>{
+    if(_sx===null) return;
+    const adx=Math.abs(e.touches[0].clientX-_sx);
+    const ady=Math.abs(e.touches[0].clientY-_sy);
+    if(!_swOk && (adx>12||ady>12)){
+      // どちらが先に閾値を超えたか
+      _swOk = adx > ady; // 横優勢ならスワイプ確定、縦優勢ならキャンセル
+      if(!_swOk) _sx=null; // 縦スクロール優先でリセット
+    }
   },{passive:true});
-  document.addEventListener('touchend',e=>{
-    if(_sx===null||_cancelled){_sx=null;return;}
+  mainEl.addEventListener('touchend',e=>{
+    if(_sx===null||!_swOk) return;
     const dx=e.changedTouches[0].clientX-_sx;
-    const dy=e.changedTouches[0].clientY-_sy;
-    _sx=null;
-    if(Math.abs(dx)<55||Math.abs(dx)<=Math.abs(dy)*1.5)return;
+    _sx=null; _swOk=false;
+    if(Math.abs(dx)<50) return;
     const idx=TABS.indexOf(currentTab);
     const next=dx<0?TABS[Math.min(idx+1,TABS.length-1)]:TABS[Math.max(idx-1,0)];
     if(next!==currentTab)switchTab(next);

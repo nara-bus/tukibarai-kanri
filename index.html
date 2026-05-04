@@ -960,15 +960,15 @@ tr:last-child td{border-bottom:none}
 <div id="toast"></div>
 
 <!-- 特別支払い 追加・編集モーダル -->
-<div id="special-add-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-end;justify-content:center">
-  <div style="background:var(--card);border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;max-width:520px;box-shadow:0 -4px 24px rgba(0,0,0,.2)">
-    <div id="sp2-modal-title" style="font-weight:700;font-size:16px;color:var(--accent);margin-bottom:16px;text-align:center">特別支払い　追加</div>
+<div id="special-add-modal" style="display:none;position:fixed;inset:0;background:rgba(80,50,30,.45);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
+  <div style="background:linear-gradient(160deg,#fdf6ec 0%,#f7ede0 100%);border-radius:18px;padding:20px 16px 20px;width:calc(100% - 40px);max-width:360px;box-shadow:0 12px 50px rgba(80,40,20,.25),0 1px 0 rgba(255,255,255,.8) inset;border:1px solid rgba(200,160,120,.25);animation:fadeScaleIn .18s ease;max-height:90vh;overflow-y:auto">
+    <div id="sp2-modal-title" style="font-weight:700;font-size:16px;color:var(--accent);margin-bottom:14px;text-align:center">特別支払い　追加</div>
     <input type="hidden" id="sp2-edit-id">
-    <!-- 年月日（テンキー） -->
+    <!-- 年月日（カレンダー） -->
     <div style="margin-bottom:10px">
       <label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">年月日</label>
       <div class="amount-input-display" id="sp2-date-display" onclick="openSpDateTenkey()" style="cursor:pointer">
-        <span id="sp2-date-display-text" class="placeholder">例：2026-01-27</span>
+        <span id="sp2-date-display-text" class="placeholder">タップして選択</span>
       </div>
       <input type="hidden" id="sp2-date-val">
     </div>
@@ -976,28 +976,58 @@ tr:last-child td{border-bottom:none}
       <input type="text" id="sp2-payee" placeholder="例：三井住友海上" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box"></div>
     <div style="margin-bottom:10px"><label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">用途</label>
       <input type="text" id="sp2-purpose" placeholder="例：任意保険 ミラ・イース" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
       <div><label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">金額（円）</label>
-        <input type="number" id="sp2-amount" placeholder="0" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box" min="0"></div>
+        <div class="amount-input-display" id="sp2-amount-display" onclick="openSpAmountTenkey()" style="cursor:pointer">
+          <span id="sp2-amount-display-text" class="placeholder">0</span>
+        </div>
+        <input type="hidden" id="sp2-amount">
+      </div>
       <div><label style="font-size:12px;color:#8a6a4a;display:block;margin-bottom:4px">支払方法</label>
         <input type="text" id="sp2-method" placeholder="例：現金" style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid rgba(160,120,80,.25);background:var(--surface);font-size:15px;box-sizing:border-box"></div>
     </div>
-    <!-- ボタン行：削除(編集時のみ) | キャンセル | 保存 -->
+    <!-- ボタン行 -->
     <div style="display:none;gap:8px" id="sp2-btn-row-edit">
-      <button id="sp2-delete-btn" onclick="deleteSpecialRowFromModal()" style="padding:12px 4px;border-radius:12px;border:1.5px solid rgba(192,112,96,.4);background:none;font-size:14px;font-weight:600;color:#c07060;cursor:pointer">🗑削除</button>
-      <button onclick="closeSpecialAddModal()" id="sp2-cancel-btn" style="padding:12px;border-radius:12px;border:1.5px solid rgba(160,120,80,.3);background:none;font-size:15px;font-weight:600;color:#8a6a4a;cursor:pointer">キャンセル</button>
-      <button onclick="saveSpecialRow()" style="padding:12px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:700;cursor:pointer">保存</button>
+      <button id="sp2-delete-btn" onclick="deleteSpecialRowFromModal()" style="padding:10px 4px;border-radius:12px;border:1.5px solid rgba(192,112,96,.4);background:none;font-size:13px;font-weight:600;color:#c07060;cursor:pointer">🗑削除</button>
+      <button onclick="closeSpecialAddModal()" style="padding:10px;border-radius:12px;border:1.5px solid rgba(160,120,80,.3);background:none;font-size:14px;font-weight:600;color:#8a6a4a;cursor:pointer">キャンセル</button>
+      <button onclick="saveSpecialRow()" style="padding:10px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:700;cursor:pointer">保存</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="sp2-btn-row-add">
-      <button onclick="closeSpecialAddModal()" style="padding:12px;border-radius:12px;border:1.5px solid rgba(160,120,80,.3);background:none;font-size:15px;font-weight:600;color:#8a6a4a;cursor:pointer">キャンセル</button>
-      <button onclick="saveSpecialRow()" style="padding:12px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:700;cursor:pointer">保存</button>
+      <button onclick="closeSpecialAddModal()" style="padding:10px;border-radius:12px;border:1.5px solid rgba(160,120,80,.3);background:none;font-size:14px;font-weight:600;color:#8a6a4a;cursor:pointer">キャンセル</button>
+      <button onclick="saveSpecialRow()" style="padding:10px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:700;cursor:pointer">保存</button>
     </div>
   </div>
 </div>
 
-<!-- 特別支払い 日付テンキー -->
-<div id="sp-date-tenkey-modal" style="display:none;pointer-events:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;align-items:flex-end;justify-content:center">
-  <div style="background:var(--card);border-radius:20px 20px 0 0;padding:16px 16px 28px;width:100%;max-width:520px">
+<!-- 特別支払い 金額テンキー -->
+<div id="sp-amount-tenkey-modal" style="display:none;pointer-events:none;position:fixed;inset:0;background:rgba(80,50,30,.45);z-index:600;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
+  <div class="tenkey-sheet" style="animation:fadeScaleIn .18s ease">
+    <div class="tenkey-title">金額を入力</div>
+    <div id="sp-amount-disp" class="tenkey-disp"><span id="sp-amount-disp-text" class="placeholder">0</span></div>
+    <div class="tkey-grid">
+      <button class="tkey" onclick="spAmountInput('1')">1</button>
+      <button class="tkey" onclick="spAmountInput('2')">2</button>
+      <button class="tkey" onclick="spAmountInput('3')">3</button>
+      <button class="tkey" onclick="spAmountInput('4')">4</button>
+      <button class="tkey" onclick="spAmountInput('5')">5</button>
+      <button class="tkey" onclick="spAmountInput('6')">6</button>
+      <button class="tkey" onclick="spAmountInput('7')">7</button>
+      <button class="tkey" onclick="spAmountInput('8')">8</button>
+      <button class="tkey" onclick="spAmountInput('9')">9</button>
+      <button class="tkey tkey-clear" onclick="spAmountClear()">C</button>
+      <button class="tkey" onclick="spAmountInput('0')">0</button>
+      <button class="tkey tkey-del" onclick="spAmountDel()">⌫</button>
+    </div>
+    <div class="tkey-action-row">
+      <button class="tkey-cancel" onclick="closeSpAmountTenkey()">キャンセル</button>
+      <button class="tkey-ok" onclick="confirmSpAmount()">確定</button>
+    </div>
+  </div>
+</div>
+
+<!-- 特別支払い 日付カレンダー -->
+<div id="sp-date-tenkey-modal" style="display:none;pointer-events:none;position:fixed;inset:0;background:rgba(80,50,30,.45);z-index:600;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
+  <div style="background:linear-gradient(160deg,#fdf6ec 0%,#f7ede0 100%);border-radius:18px;padding:16px 16px 20px;width:calc(100% - 40px);max-width:320px;box-shadow:0 12px 50px rgba(80,40,20,.25),0 1px 0 rgba(255,255,255,.8) inset;border:1px solid rgba(200,160,120,.25);animation:fadeScaleIn .18s ease">
     <div style="font-size:13px;color:#8a6a4a;text-align:center;margin-bottom:12px">日付を選択</div>
     <!-- 年月ナビ -->
     <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">
@@ -1366,9 +1396,42 @@ function copyPrevYear(){
 }
 
 // ── 日付テンキー ──
-// ── カレンダー日付選択 ──
-let _spCalYear = 2026, _spCalMonth = 1;
+// ── 特別 金額テンキー ──
+let _spCalYear = new Date().getFullYear(), _spCalMonth = new Date().getMonth()+1;
+let _spAmountVal = '0';
+function openSpAmountTenkey(){
+  _spAmountVal = document.getElementById('sp2-amount').value || '0';
+  _spAmountRefresh();
+  const tk = document.getElementById('sp-amount-tenkey-modal');
+  tk.style.display = 'flex'; tk.style.pointerEvents = 'auto';
+}
+function closeSpAmountTenkey(){
+  const tk = document.getElementById('sp-amount-tenkey-modal');
+  tk.style.display = 'none'; tk.style.pointerEvents = 'none';
+}
+function spAmountInput(d){
+  if(_spAmountVal==='0') _spAmountVal='';
+  if(_spAmountVal.length<10) _spAmountVal+=d;
+  _spAmountRefresh();
+}
+function spAmountDel(){ _spAmountVal=_spAmountVal.slice(0,-1)||'0'; _spAmountRefresh(); }
+function spAmountClear(){ _spAmountVal='0'; _spAmountRefresh(); }
+function _spAmountRefresh(){
+  const n = parseInt(_spAmountVal)||0;
+  const el = document.getElementById('sp-amount-disp-text');
+  el.textContent = n>0 ? '¥'+n.toLocaleString() : '0';
+  el.classList.toggle('placeholder', n===0);
+}
+function confirmSpAmount(){
+  const n = parseInt(_spAmountVal)||0;
+  document.getElementById('sp2-amount').value = n||'';
+  const el = document.getElementById('sp2-amount-display-text');
+  el.textContent = n>0 ? '¥'+n.toLocaleString() : '0';
+  el.classList.toggle('placeholder', n===0);
+  closeSpAmountTenkey();
+}
 
+// ── カレンダー日付選択 ──
 function openSpDateTenkey(){
   const cur = document.getElementById('sp2-date-val').value;
   if(cur && cur.length>=8){
@@ -1380,14 +1443,12 @@ function openSpDateTenkey(){
     _spCalMonth = now.getMonth()+1;
   }
   _spCalRender();
-  document.getElementById('special-add-modal').style.display = 'none';
   const tk = document.getElementById('sp-date-tenkey-modal');
   tk.style.display = 'flex'; tk.style.pointerEvents = 'auto';
 }
 function closeSpDateTenkey(){
   const tk = document.getElementById('sp-date-tenkey-modal');
   tk.style.display = 'none'; tk.style.pointerEvents = 'none';
-  document.getElementById('special-add-modal').style.display = 'flex';
 }
 function spCalMove(dir){
   _spCalMonth += dir;
@@ -1446,10 +1507,12 @@ function openSpecialAddModal(){
   document.getElementById('sp2-payee').value = '';
   document.getElementById('sp2-purpose').value = '';
   document.getElementById('sp2-amount').value = '';
+  const amtEl2 = document.getElementById('sp2-amount-display-text');
+  amtEl2.textContent = '0'; amtEl2.classList.add('placeholder');
   document.getElementById('sp2-method').value = '現金';
   document.getElementById('sp2-date-val').value = '';
   const el = document.getElementById('sp2-date-display-text');
-  el.textContent = '例：2026-01-27'; el.classList.add('placeholder');
+  el.textContent = 'タップして選択'; el.classList.add('placeholder');
   _spModalMode(false);
   document.getElementById('special-add-modal').style.display = 'flex';
 }
@@ -1461,6 +1524,10 @@ function openSpecialEditModal(id){
   document.getElementById('sp2-payee').value = row.payee || '';
   document.getElementById('sp2-purpose').value = row.purpose || '';
   document.getElementById('sp2-amount').value = row.amount || '';
+  const amtEl = document.getElementById('sp2-amount-display-text');
+  const amtN = parseInt(row.amount)||0;
+  amtEl.textContent = amtN>0 ? '¥'+amtN.toLocaleString() : '0';
+  amtEl.classList.toggle('placeholder', amtN===0);
   document.getElementById('sp2-method').value = row.method || '';
   // 日付復元
   const dateVal = row.year && row.mmdd ? `${row.year}-${row.mmdd}` : '';

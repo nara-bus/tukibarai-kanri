@@ -563,6 +563,7 @@ tr:last-child td{border-bottom:none}
     <button class="hbtn" style="min-width:32px;padding:5px 7px;font-size:16px" onclick="changeReportMonth(-1)">‹</button>
     <span id="header-month" style="color:#fde0b8;font-size:17px;font-weight:700;white-space:nowrap;min-width:88px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.15)"></span>
     <button class="hbtn" style="min-width:32px;padding:5px 7px;font-size:16px" onclick="changeReportMonth(1)">›</button>
+    <button class="hbtn" id="btn-today-month" style="font-size:11px;padding:4px 7px;opacity:0;pointer-events:none;transition:opacity .2s" onclick="goToThisMonth()">今月</button>
   </div>
   <div style="display:flex;gap:6px">
     <button class="hbtn" onclick="exportData()">
@@ -1300,6 +1301,16 @@ function freqTag(f){
   const cls={monthly:'tag-monthly',bimonthly:'tag-bimonthly',quarterly:'tag-other',yearly:'tag-yearly','semi-yearly':'tag-other'}[f]||'tag-other';
   return`<span class="tag ${cls}">${freqLabel(f)}</span>`;
 }
+function nextDueMonth(p){
+  const now=new Date();
+  const cy=now.getFullYear(),cm=now.getMonth()+1;
+  for(let i=0;i<=12;i++){
+    let m=cm+i;let y=cy;
+    if(m>12){m-=12;y++;}
+    if(isPeriodicDue(p,y,m)) return{y,m};
+  }
+  return null;
+}
 function isPeriodicDue(p,y,m){
   if(p.freq==='monthly')return true;
   if(p.freq==='bimonthly')return m%2===p.month%2;
@@ -1721,7 +1732,9 @@ function renderPeriodicSuggestion(){
   if(!due.length){el.style.display='none';return}
   el.style.display='';
   hdr.textContent=`🔄 ${y}年${m}月の定期支払い`;
-  body.innerHTML=due.map(p=>`
+  body.innerHTML=due.map(p=>{
+    const applied=getEntriesForMonth(y,m).some(e=>e.payee===p.payee);
+    return `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
       <div>
         <div style="font-weight:600;font-size:15px">${p.payee} ${rateBadge(p.ratio_pct||50)}</div>
@@ -1729,10 +1742,10 @@ function renderPeriodicSuggestion(){
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-weight:700;color:var(--primary)">${p.amount?fmt(p.amount):'金額未設定'}</span>
-        <button class="btn btn-accent btn-sm" onclick="addPeriodicEntry('${p.id}','${defaultDate}')">追加</button>
+        <button class="btn btn-accent btn-sm" ${applied?'style="background:#aaa;border-color:#aaa;box-shadow:0 2px 0 #888,0 4px 10px rgba(0,0,0,.1);pointer-events:none"':`onclick="addPeriodicEntry('${p.id}','${defaultDate}')"`}>${applied?'追加済':'追加'}</button>
       </div>
     </div>
-  `).join('');
+  `;}).join('');
 }
 function addEntry(){
   const date=document.getElementById('in-date').value;
@@ -1844,8 +1857,24 @@ function changeReportMonth(dir){
   if(reportMonth>12){reportMonth=1;reportYear++;}
   if(reportMonth<1){reportMonth=12;reportYear--;}
   document.getElementById('header-month').textContent=`${reportYear}年${reportMonth}月`;
+  _updateTodayMonthBtn();
   if(currentTab==='input')renderInputTab();
   else if(currentTab==='report')renderReport();
+}
+function goToThisMonth(){
+  const now=new Date();
+  reportYear=now.getFullYear();reportMonth=now.getMonth()+1;
+  document.getElementById('header-month').textContent=`${reportYear}年${reportMonth}月`;
+  _updateTodayMonthBtn();
+  if(currentTab==='input')renderInputTab();
+  else if(currentTab==='report')renderReport();
+}
+function _updateTodayMonthBtn(){
+  const now=new Date();
+  const isToday=reportYear===now.getFullYear()&&reportMonth===now.getMonth()+1;
+  const btn=document.getElementById('btn-today-month');
+  btn.style.opacity=isToday?'0':'1';
+  btn.style.pointerEvents=isToday?'none':'auto';
 }
 
 // ── EDIT MODAL ──
@@ -1899,7 +1928,7 @@ function renderSettings(){
     return`<div class="setting-item">
       <div class="setting-info">
         <div class="setting-name">${p.payee} ${freqTag(p.freq)} ${rateBadge(pct)}</div>
-        <div class="setting-sub">${p.purpose}　支払月：${p.month}月〜　${p.note?'/ '+p.note:''}</div>
+        <div class="setting-sub">${p.purpose}　${p.note?'/ '+p.note:''}</div><div class="setting-sub" style="color:var(--accent);font-weight:700">${(()=>{const nd=nextDueMonth(p);return nd?'次回: '+nd.y+'年'+nd.m+'月':''})()} <span style="font-weight:400;color:var(--text-sub)">（開始月: ${p.month}月）</span></div>
       </div>
       <span class="setting-amount">${p.amount?fmt(p.amount):'―'}</span>
       <button class="icon-btn" onclick="openPeriodicEditModal('${p.id}')" title="編集">✏️</button>
@@ -2012,16 +2041,16 @@ function saveYearlyMemo(){yearlyMemos[selectedYear]=document.getElementById('yea
 // ── EXPORT / IMPORT ──
 function exportData(){
   const d=new Date();
-  const fname=`月払い管理_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;
+  const fname=`月払い${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}.json`;
   document.getElementById('save-filename').textContent=fname;
   document.getElementById('save-modal').classList.add('open');
 }
 function closeSaveModal(){document.getElementById('save-modal').classList.remove('open')}
 async function doExport(){
-  const data={entries,periodics,yearlyMemos,exportedAt:new Date().toISOString()};
+  const data={entries,periodics,yearlyMemos,special:loadSpecial(),exportedAt:new Date().toISOString()};
   const json=JSON.stringify(data,null,2);
   const d=new Date();
-  const fname=`月払い管理_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;
+  const fname=`月払い${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}.json`;
   closeSaveModal();
 
   // showSaveFilePicker対応ブラウザ（Chrome等・HTTPS環境）
@@ -2074,6 +2103,7 @@ function handleImport(e){
       if(data.entries)entries=data.entries;
       if(data.periodics)periodics=data.periodics;
       if(data.yearlyMemos)yearlyMemos=data.yearlyMemos;
+      if(data.special)saveSpecial(data.special);
       sv(SK.entries,entries);sv(SK.periodic,periodics);sv(SK.memos,yearlyMemos);
       showToast('✓ データを読み込みました');
       switchTab(currentTab);
@@ -2088,7 +2118,7 @@ function handleImport(e){
 // ── PWA SERVICE WORKER ──
 if('serviceWorker' in navigator){
   const swCode=`
-const CACHE='tsukibarai-v2';
+const CACHE='tsukibarai-kanri-v1';
 self.addEventListener('install',e=>{
   e.waitUntil(
     caches.open(CACHE).then(c=>c.addAll([location.pathname||'/']))

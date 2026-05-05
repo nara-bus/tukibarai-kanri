@@ -637,48 +637,8 @@ tr:last-child td{border-bottom:none}
   <!-- TAB: 設定 -->
   <div id="tab-settings" class="tab-content">
     <div class="card">
-      <div class="card-header">🔄 定期支払いを追加</div>
-      <div class="card-body">
-        <div class="form-grid">
-          <div class="form-full"><label>支払先</label><input type="text" id="sp-payee" placeholder="例：NHK"></div>
-          <div class="form-full"><label>用途</label><input type="text" id="sp-purpose" placeholder="例：受信料 年一括払い"></div>
-          <div>
-            <label>金額（円）</label>
-            <div class="amount-input-display" id="sp-amount-display" onclick="openTenkey('sp')">
-              <span class="placeholder" id="sp-amount-display-text">タップして入力</span>
-              <span style="font-size:13px;color:#aab">▼</span>
-            </div>
-            <input type="hidden" id="sp-amount" value="">
-          </div>
-          <div><label>頻度</label>
-            <select id="sp-freq">
-              <option value="monthly">毎月</option>
-              <option value="bimonthly">隔月</option>
-              <option value="quarterly">3ヶ月ごと</option>
-              <option value="yearly">年1回</option>
-              <option value="semi-yearly">半年ごと</option>
-            </select>
-          </div>
-          <div><label>支払月（開始月）</label>
-            <select id="sp-month">
-              <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
-              <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
-              <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
-              <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
-            </select>
-          </div>
-          <div><label>備考</label><input type="text" id="sp-note" placeholder="例：銀行引落"></div>
-          <div class="form-full">
-            <label>請求分</label>
-            <div class="ratio-toggle-row">
-              <button class="ratio-toggle active" id="sp-ratio-50" onclick="setSpRatio(50)">50%</button>
-              <button class="ratio-toggle" id="sp-ratio-100" onclick="setSpRatio(100)">100%</button>
-            </div>
-          </div>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-accent btn-block" onclick="addPeriodic()">＋ 定期支払いを登録</button>
-        </div>
+      <div class="card-body" style="padding:10px 12px">
+        <button class="btn btn-accent btn-block" onclick="openPeriodicAddModal()" style="font-size:15px;padding:13px 16px">＋ 定期支払いを追加</button>
       </div>
     </div>
     <div class="card">
@@ -804,6 +764,58 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
+
+<!-- 定期支払い追加モーダル -->
+<div class="modal-overlay" id="periodic-add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🔄 定期支払いを追加</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-full"><label>支払先</label><input type="text" id="sp-payee" placeholder="例：NHK"></div>
+        <div class="form-full"><label>用途</label><input type="text" id="sp-purpose" placeholder="例：受信料 年一括払い"></div>
+        <div>
+          <label>金額（円）</label>
+          <div class="amount-input-display" id="sp-amount-display" onclick="openTenkey('sp')">
+            <span class="placeholder" id="sp-amount-display-text">タップして入力</span>
+            <span style="font-size:13px;color:#aab">▼</span>
+          </div>
+          <input type="hidden" id="sp-amount" value="">
+        </div>
+        <div><label>頻度</label>
+          <select id="sp-freq">
+            <option value="monthly">毎月</option>
+            <option value="bimonthly">隔月</option>
+            <option value="quarterly">3ヶ月ごと</option>
+            <option value="yearly">年1回</option>
+            <option value="semi-yearly">半年ごと</option>
+          </select>
+        </div>
+        <div><label>支払月（開始月）</label>
+          <select id="sp-month">
+            <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+            <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+            <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+            <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+          </select>
+        </div>
+        <div><label>備考</label><input type="text" id="sp-note" placeholder="例：銀行引落"></div>
+        <div class="form-full">
+          <label>請求分</label>
+          <div class="ratio-toggle-row">
+            <button class="ratio-toggle active" id="sp-ratio-50" onclick="setSpRatio(50)">50%</button>
+            <button class="ratio-toggle" id="sp-ratio-100" onclick="setSpRatio(100)">100%</button>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button class="btn" style="background:#e8ddd0;border:none;color:#5a4030;font-size:15px;padding:13px 16px" onclick="closePeriodicAddModal()">キャンセル</button>
+        <button class="btn btn-accent" onclick="addPeriodic()" style="font-size:15px;padding:13px 16px">決定</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- 定期支払い編集モーダル -->
 <div class="modal-overlay" id="periodic-edit-modal">
@@ -1748,7 +1760,36 @@ function addEntry(){
 function addPeriodicEntry(pid,dateVal){
   const p=periodics.find(x=>x.id===pid);if(!p)return;
   const date=dateVal||new Date().toISOString().slice(0,10);
-  entries.push({id:genId(),date,amount:p.amount,payee:p.payee,purpose:p.purpose,note:p.note,ratio_pct:p.ratio_pct||50});
+
+  // 同じ支払先の直近エントリを取得して「〇月分」「〇月、〇月分」を自動計算
+  const samePayee=entries.filter(e=>e.payee===p.payee).sort((a,b)=>b.date.localeCompare(a.date));
+  let purpose=p.purpose;
+  if(samePayee.length){
+    const lastPurpose=samePayee[0].purpose||'';
+    // 複数月パターン: 「1月、2月分」「1月・2月分」など
+    const multiM=lastPurpose.match(/(\d+)月([、・,\s]*)(\d+)月分/);
+    // 単月パターン: 「3月分」
+    const singleM=!multiM && lastPurpose.match(/(\d+)月分/);
+    if(multiM){
+      const first=parseInt(multiM[1],10);
+      const sep=multiM[2];
+      const last=parseInt(multiM[3],10);
+      const step=((last-first+12)%12)+1; // 幅+1が次へのステップ（1,2月→step=2→3,4月）
+      const newFirst=((first-1+step)%12)+1;
+      const newLast=((last-1+step)%12)+1;
+      purpose=lastPurpose.replace(/(\d+)月([、・,\s]*)(\d+)月分/,`${newFirst}月${sep}${newLast}月分`);
+    }else if(singleM){
+      const addDate=new Date(date);
+      const lastDate=new Date(samePayee[0].date);
+      const monthDiff=(addDate.getFullYear()-lastDate.getFullYear())*12+(addDate.getMonth()-lastDate.getMonth());
+      const lastMonth=parseInt(singleM[1],10);
+      let newMonth=lastMonth+Math.max(1,monthDiff);
+      newMonth=((newMonth-1)%12)+1;
+      purpose=lastPurpose.replace(/\d+月分/,`${newMonth}月分`);
+    }
+  }
+
+  entries.push({id:genId(),date,amount:p.amount,payee:p.payee,purpose,note:p.note,ratio_pct:p.ratio_pct||50});
   sv(SK.entries,entries);
   showToast(`✓ ${p.payee}を追加しました`);
   renderInputTab();
@@ -1890,8 +1931,20 @@ function addPeriodic(){
   document.getElementById('sp-amount-display-text').classList.add('placeholder');
   document.getElementById('sp-note').value='';
   setSpRatio(50);
+  closePeriodicAddModal();
   showToast('✓ 定期支払いを登録しました');renderSettings();
 }
+function openPeriodicAddModal(){
+  document.getElementById('sp-payee').value='';
+  document.getElementById('sp-purpose').value='';
+  document.getElementById('sp-amount').value='';
+  document.getElementById('sp-amount-display-text').textContent='タップして入力';
+  document.getElementById('sp-amount-display-text').classList.add('placeholder');
+  document.getElementById('sp-note').value='';
+  setSpRatio(50);
+  document.getElementById('periodic-add-modal').classList.add('open');
+}
+function closePeriodicAddModal(){document.getElementById('periodic-add-modal').classList.remove('open')}
 function openPeriodicEditModal(id){
   const p=periodics.find(x=>x.id===id);if(!p)return;
   document.getElementById('pedit-id').value=p.id;

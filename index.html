@@ -1339,8 +1339,12 @@ function saveSpecial(data){
   localStorage.setItem(SK_SP, JSON.stringify(data));
 }
 
-// 初期データ投入（initプレフィックスIDはマスターとして常にマージ）
+// 初期データ投入（バージョンが変わったときのみマージ）
+const INIT_VER = 'v2';  // masterを変更したらここを更新する
+const SK_INIT_VER = 'tsukiharai_special_init_ver';
 (function initSpecialData(){
+  // 同じバージョンで既に投入済みならスキップ
+  if(localStorage.getItem(SK_INIT_VER) === INIT_VER) return;
   const mk = (id,year,mmdd,payee,purpose,amount,method)=>({id,year,mmdd,payee,purpose,amount,method});
   const master = [
     // 2025年
@@ -1375,6 +1379,7 @@ function saveSpecial(data){
   const existing = (()=>{try{return JSON.parse(localStorage.getItem(SK_SP)||'[]');}catch(e){return[];}})();
   const userRows = existing.filter(r=>!String(r.id).startsWith('init'));
   saveSpecial([...master, ...userRows]);
+  localStorage.setItem(SK_INIT_VER, INIT_VER);
 })();
 
 let _spYear = 2026;

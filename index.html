@@ -1711,7 +1711,11 @@ function switchTab(tab){
   document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
   // 月ナビは入力・月次タブのみ表示
   const showMonthNav = tab==='input'||tab==='report';
-  document.getElementById('month-nav-bar').style.visibility = showMonthNav?'visible':'hidden';
+  const navBar = document.getElementById('month-nav-bar');
+  const todayBtn = document.getElementById('btn-today-month');
+  navBar.style.visibility = showMonthNav?'visible':'hidden';
+  if(!showMonthNav) todayBtn.style.visibility='hidden';
+  else _updateTodayMonthBtn();
   if(tab==='input')renderInputTab();
   if(tab==='report')renderReport();
   if(tab==='settings')renderSettings();

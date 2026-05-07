@@ -1713,7 +1713,8 @@ function switchTab(tab){
   const showMonthNav = tab==='input'||tab==='report';
   const navBar = document.getElementById('month-nav-bar');
   const todayBtn = document.getElementById('btn-today-month');
-  navBar.style.visibility = showMonthNav?'visible':'hidden';
+  navBar.style.display = showMonthNav?'flex':'none';
+  document.getElementById('main').style.top = showMonthNav?'90px':'54px';
   if(!showMonthNav) todayBtn.style.visibility='hidden';
   else _updateTodayMonthBtn();
   if(tab==='input')renderInputTab();

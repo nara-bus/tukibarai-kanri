@@ -45,7 +45,7 @@
   --bg:#f0ebe0;--card:#fdf8f0;--primary:#8b6f5e;--primary-light:#a88778;
   --accent:#c9874a;--accent2:#7a9e7e;--danger:#c26060;
   --text:#4a3728;--text-sub:#8a7060;--border:#d8c9b8;--row-even:#faf5ec;
-  --shadow:0 2px 14px rgba(100,70,50,.10);--tab-h:62px;--header-h:54px;
+  --shadow:0 2px 14px rgba(100,70,50,.10);--tab-h:62px;--header-h:90px;
   --warm1:#e8d5c0;--warm2:#d4b896;--sage:#c5d4c0;--rose:#e8c8c0;
   --card-border:1.5px solid rgba(180,150,120,.25);
   --surface:rgba(255,252,245,.9);
@@ -64,7 +64,7 @@ body{
 
 /* ── HEADER ── */
 #app-header{
-  position:fixed;top:0;left:0;right:0;z-index:100;height:var(--header-h);
+  position:fixed;top:0;left:0;right:0;z-index:100;height:54px;
   background:linear-gradient(135deg,#b89880 0%,#a07f6a 50%,#8b6f5e 100%);
   display:flex;align-items:center;justify-content:space-between;
   padding:0 8px;gap:4px;
@@ -74,13 +74,26 @@ body{
   content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
   background:linear-gradient(90deg,transparent,rgba(255,240,220,.4),transparent);
 }
+#month-nav-bar{
+  position:fixed;top:54px;left:0;right:0;z-index:99;height:36px;
+  display:flex;align-items:flex-start;justify-content:center;
+  pointer-events:none;
+}
+#month-nav-bar > *{pointer-events:auto;}
+#month-nav-inner{
+  display:inline-flex;align-items:center;gap:4px;
+  background:linear-gradient(135deg,#a07f6a 0%,#8b6f5e 100%);
+  border-radius:0 0 12px 12px;
+  padding:0 10px;height:36px;
+  box-shadow:0 2px 8px rgba(100,70,50,.15);
+}
 #header-title{color:#fdf0e0;font-size:17px;font-weight:700;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.15)}
 .hbtn{
   display:flex;flex-direction:column;align-items:center;gap:2px;
   background:rgba(255,240,220,.18);color:#fdf0e0;border:1px solid rgba(255,240,220,.25);border-radius:9px;
   padding:5px 8px;cursor:pointer;font-size:11px;font-family:inherit;font-weight:700;
   box-shadow:0 2px 0 rgba(0,0,0,.15);transform:translateY(0);
-  transition:box-shadow .08s,transform .08s,background .15s;white-space:nowrap;
+  transition:box-shadow .08s,transform .08s,background .15s;white-space:nowrap;min-width:44px;
   backdrop-filter:blur(4px);
 }
 .hbtn:active{box-shadow:0 1px 0 rgba(0,0,0,.1);transform:translateY(1px);background:rgba(255,240,220,.28)}
@@ -582,13 +595,7 @@ tr:last-child td{border-bottom:none}
 <!-- HEADER -->
 <div id="app-header">
   <span id="header-title">💴 月払い管理</span>
-  <div id="header-month-nav" style="flex:0 1 auto;display:flex;align-items:center;justify-content:center;gap:4px">
-    <button class="hbtn" style="min-width:32px;padding:5px 7px;font-size:16px" onclick="changeReportMonth(-1)">‹</button>
-    <span id="header-month" style="color:#fde0b8;font-size:17px;font-weight:700;white-space:nowrap;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.15)"></span>
-    <button class="hbtn" style="min-width:32px;padding:5px 7px;font-size:16px" onclick="changeReportMonth(1)">›</button>
-    <button class="hbtn" id="btn-today-month" style="font-size:11px;padding:4px 7px;opacity:0;pointer-events:none;transition:opacity .2s" onclick="goToThisMonth()">今月</button>
-  </div>
-  <div style="display:flex;gap:4px">
+  <div style="display:flex;gap:6px">
     <button class="hbtn" onclick="exportData()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       保存
@@ -599,6 +606,16 @@ tr:last-child td{border-bottom:none}
     </button>
   </div>
 </div>
+
+<!-- MONTH NAV BAR -->
+<div id="month-nav-bar">
+  <div id="month-nav-inner">
+    <button class="hbtn" style="min-width:32px;padding:5px 7px;font-size:16px" onclick="changeReportMonth(-1)">‹</button>
+    <span id="header-month" style="color:#fde0b8;font-size:17px;font-weight:700;white-space:nowrap;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.15)"></span>
+    <button class="hbtn" style="min-width:32px;padding:5px 7px;font-size:16px" onclick="changeReportMonth(1)">›</button>
+  </div>
+</div>
+<button id="btn-today-month" style="position:fixed;top:57px;right:8px;z-index:100;font-size:13px;padding:4px 12px;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .2s;background:#8b6f5e;border:1px solid rgba(255,240,220,.4);border-radius:10px;color:#fdf0e0;font-weight:700;font-family:inherit;cursor:pointer;height:30px;" onclick="goToThisMonth()">今月</button>
 
 <!-- MAIN -->
 <div id="main">
@@ -1694,7 +1711,7 @@ function switchTab(tab){
   document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
   // 月ナビは入力・月次タブのみ表示
   const showMonthNav = tab==='input'||tab==='report';
-  document.getElementById('header-month-nav').style.visibility = showMonthNav?'visible':'hidden';
+  document.getElementById('month-nav-bar').style.visibility = showMonthNav?'visible':'hidden';
   if(tab==='input')renderInputTab();
   if(tab==='report')renderReport();
   if(tab==='settings')renderSettings();
@@ -1705,6 +1722,7 @@ function switchTab(tab){
 // ── INIT ──
 window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('header-month').textContent=`${reportYear}年${reportMonth}月`;
+  _updateTodayMonthBtn();
   document.getElementById('add-form-modal').addEventListener('click',function(e){if(e.target===this)closeAddForm()});
   document.getElementById('tenkey-modal').addEventListener('click',function(e){if(e.target===this)closeTenkey()});
   document.getElementById('save-modal').addEventListener('click',function(e){if(e.target===this)closeSaveModal()});
@@ -1925,6 +1943,7 @@ function _updateTodayMonthBtn(){
   const btn=document.getElementById('btn-today-month');
   btn.style.opacity=isToday?'0':'1';
   btn.style.pointerEvents=isToday?'none':'auto';
+  btn.style.visibility=isToday?'hidden':'visible';
 }
 
 // ── EDIT MODAL ──

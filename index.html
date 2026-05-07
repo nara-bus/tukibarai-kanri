@@ -67,7 +67,7 @@ body{
   position:fixed;top:0;left:0;right:0;z-index:100;height:var(--header-h);
   background:linear-gradient(135deg,#b89880 0%,#a07f6a 50%,#8b6f5e 100%);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 12px;gap:6px;
+  padding:0 8px;gap:4px;
   box-shadow:0 2px 12px rgba(100,70,50,.20);
 }
 #app-header::after{
@@ -80,7 +80,7 @@ body{
   background:rgba(255,240,220,.18);color:#fdf0e0;border:1px solid rgba(255,240,220,.25);border-radius:9px;
   padding:5px 8px;cursor:pointer;font-size:11px;font-family:inherit;font-weight:700;
   box-shadow:0 2px 0 rgba(0,0,0,.15);transform:translateY(0);
-  transition:box-shadow .08s,transform .08s,background .15s;white-space:nowrap;min-width:44px;
+  transition:box-shadow .08s,transform .08s,background .15s;white-space:nowrap;
   backdrop-filter:blur(4px);
 }
 .hbtn:active{box-shadow:0 1px 0 rgba(0,0,0,.1);transform:translateY(1px);background:rgba(255,240,220,.28)}
@@ -582,13 +582,13 @@ tr:last-child td{border-bottom:none}
 <!-- HEADER -->
 <div id="app-header">
   <span id="header-title">💴 月払い管理</span>
-  <div id="header-month-nav" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px">
+  <div id="header-month-nav" style="flex:0 1 auto;display:flex;align-items:center;justify-content:center;gap:4px">
     <button class="hbtn" style="min-width:32px;padding:5px 7px;font-size:16px" onclick="changeReportMonth(-1)">‹</button>
-    <span id="header-month" style="color:#fde0b8;font-size:17px;font-weight:700;white-space:nowrap;min-width:88px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.15)"></span>
+    <span id="header-month" style="color:#fde0b8;font-size:17px;font-weight:700;white-space:nowrap;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.15)"></span>
     <button class="hbtn" style="min-width:32px;padding:5px 7px;font-size:16px" onclick="changeReportMonth(1)">›</button>
     <button class="hbtn" id="btn-today-month" style="font-size:11px;padding:4px 7px;opacity:0;pointer-events:none;transition:opacity .2s" onclick="goToThisMonth()">今月</button>
   </div>
-  <div style="display:flex;gap:6px">
+  <div style="display:flex;gap:4px">
     <button class="hbtn" onclick="exportData()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       保存

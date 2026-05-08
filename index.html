@@ -420,10 +420,10 @@ tr:last-child td{border-bottom:none}
 /* ── ADD ENTRY BUTTON ── */
 .add-entry-btn{
   display:flex;align-items:center;justify-content:center;gap:8px;
-  width:100%;padding:16px;margin-bottom:13px;
+  width:100%;padding:13px 16px;margin-bottom:13px;
   background:linear-gradient(135deg,#d4956a 0%,#c9874a 100%);
-  color:#fff8f0;border:none;border-radius:14px;
-  font-size:16px;font-weight:700;
+  color:#fff8f0;border:none;border-radius:10px;
+  font-size:15px;font-weight:700;
   font-family:'Zen Maru Gothic','Hiragino Kaku Gothic ProN',sans-serif;
   cursor:pointer;
   box-shadow:0 4px 0 #a06030,0 6px 16px rgba(180,100,40,.2);
@@ -673,11 +673,7 @@ tr:last-child td{border-bottom:none}
 
   <!-- TAB: 設定 -->
   <div id="tab-settings" class="tab-content">
-    <div class="card">
-      <div class="card-body" style="padding:10px 12px">
-        <button class="btn btn-accent btn-block" onclick="openPeriodicAddModal()" style="font-size:15px;padding:13px 16px">＋ 定期支払いを追加</button>
-      </div>
-    </div>
+    <button class="btn btn-accent btn-block" onclick="openPeriodicAddModal()" style="font-size:15px;padding:13px 16px;margin-bottom:13px">＋ 定期支払いを追加</button>
     <div class="card">
       <div class="card-header">📋 登録済み定期支払い</div>
       <div class="card-body" id="periodic-list"></div>
@@ -1848,7 +1844,7 @@ function renderPeriodicSuggestion(){
         <div style="font-size:13px;color:var(--text-sub)">${p.purpose} ${freqTag(p.freq)}</div>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-weight:700;color:var(--primary)">${p.amount?fmt(p.amount):'金額未設定'}</span>
+        <span style="font-weight:700;color:var(--primary);font-size:15px">${p.amount?fmt(p.amount):'金額未設定'}</span>
         <button class="btn btn-accent btn-sm" ${applied?'style="background:#aaa;border-color:#aaa;box-shadow:0 2px 0 #888,0 4px 10px rgba(0,0,0,.1);pointer-events:none"':`onclick="addPeriodicEntry('${p.id}','${defaultDate}')"`}>${applied?'追加済':'追加'}</button>
       </div>
     </div>

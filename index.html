@@ -606,9 +606,9 @@ tr:last-child td{border-bottom:none}
 <!-- MONTH NAV BAR -->
 <div id="month-nav-bar">
   <div id="month-nav-inner">
-    <button class="hbtn" style="min-width:32px;padding:5px 7px;font-size:15px;color:#fdf0e0" onclick="changeReportMonth(-1)">◀</button>
-    <span id="header-month" style="color:#5c3317;font-size:17px;font-weight:700;white-space:nowrap;text-align:center;text-shadow:0 1px 2px rgba(255,220,180,.3)"></span>
-    <button class="hbtn" style="min-width:32px;padding:5px 7px;font-size:15px;color:#fdf0e0" onclick="changeReportMonth(1)">▶</button>
+    <button class="hbtn sp-year-nav-btn" style="color:#fdf0e0" onclick="changeReportMonth(-1)">◀</button>
+    <span id="header-month" style="color:#8b5a2b;font-size:17px;font-weight:700;white-space:nowrap;text-align:center;text-shadow:0 1px 2px rgba(255,220,180,.3)"></span>
+    <button class="hbtn sp-year-nav-btn" style="color:#fdf0e0" onclick="changeReportMonth(1)">▶</button>
   </div>
 </div>
 <button id="btn-today-month" style="position:fixed;top:57px;right:8px;z-index:100;font-size:13px;padding:4px 12px;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .2s;background:#8b6f5e;border:1px solid rgba(255,240,220,.4);border-radius:10px;color:#fdf0e0;font-weight:700;font-family:inherit;cursor:pointer;height:30px;" onclick="goToThisMonth()">今月</button>
@@ -686,7 +686,17 @@ tr:last-child td{border-bottom:none}
 
   <!-- TAB: 年間 -->
   <div id="tab-yearly" class="tab-content">
-    <div class="year-selector" id="year-selector"></div>
+    <div style="display:flex;align-items:center;margin-bottom:12px">
+      <div style="width:32px;flex-shrink:0"></div>
+      <div style="flex:1;display:flex;justify-content:center;align-items:center;gap:4px">
+        <button class="hbtn sp-year-nav-btn" style="color:#fdf0e0" onclick="yearlyYearMove(-1)">◀</button>
+        <span id="yearly-year-label" style="font-size:17px;font-weight:700;color:#8b5a2b;min-width:68px;text-align:center;text-shadow:0 1px 2px rgba(255,220,180,.3)"></span>
+        <button class="hbtn sp-year-nav-btn" style="color:#fdf0e0" onclick="yearlyYearMove(1)">▶</button>
+      </div>
+      <button id="yearly-delete-btn" onclick="openYearlyDeleteConfirm()"
+        style="background:linear-gradient(135deg,#e8521a 0%,#cc3e0a 100%);color:#fff;border:none;border-radius:10px;width:32px;height:32px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(180,40,10,.3);flex-shrink:0"
+        title="この年のデータを一括削除">🗑️</button>
+    </div>
     <div class="card">
       <div class="card-header">📊 年間支払先別集計</div>
       <div class="card-body" id="yearly-payee-list"></div>
@@ -725,11 +735,14 @@ tr:last-child td{border-bottom:none}
           </div>
           <div style="display:flex;align-items:center;gap:6px">
             <button class="hbtn sp-year-nav-btn" style="color:#fdf0e0" onclick="specialYearMove(-1)">◀</button>
-            <span id="special-year-label" class="sp-year-label"></span>
+            <span id="special-year-label" class="sp-year-label" style="color:#8b5a2b;text-shadow:0 1px 2px rgba(255,220,180,.3)"></span>
             <button class="hbtn sp-year-nav-btn" style="color:#fdf0e0" onclick="specialYearMove(1)">▶</button>
           </div>
-          <div style="flex:1;display:flex;justify-content:flex-end">
+          <div style="flex:1;display:flex;justify-content:flex-end;gap:6px">
             <button onclick="openSpecialAddModal()" class="sp-add-btn">＋</button>
+            <button id="special-delete-btn" onclick="openSpecialYearDeleteConfirm()"
+              style="background:linear-gradient(135deg,#e8521a 0%,#cc3e0a 100%);color:#fff;border:none;border-radius:10px;width:32px;height:32px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(180,40,10,.3);flex-shrink:0"
+              title="この年のデータを一括削除">🗑️</button>
           </div>
         </div>
         <!-- テーブル -->
@@ -1137,7 +1150,24 @@ tr:last-child td{border-bottom:none}
 // ── DATA ──
 const SK={entries:'tsukibarai_entries',periodic:'tsukibarai_periodic',memos:'tsukibarai_memos'};
 function load(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}
-function sv(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function sv(k,v){
+  try{
+    localStorage.setItem(k,JSON.stringify(v));
+    // 保存後に全体サイズをチェック
+    let total=0;
+    for(let i=0;i<localStorage.length;i++){
+      const key=localStorage.key(i);
+      total+=(localStorage.getItem(key)||'').length*2; // UTF-16換算
+    }
+    if(total>4*1024*1024){
+      showToast('⚠ 保存データが4MBを超えました。古いデータの削除をお勧めします。');
+    }
+  }catch(e){
+    if(e.name==='QuotaExceededError'||e.code===22){
+      showToast('⚠ 保存容量が上限に達しました。古いデータを削除してください。');
+    }
+  }
+}
 
 let entries=load(SK.entries,[]);
 let periodics=load(SK.periodic,[]);
@@ -1423,6 +1453,13 @@ let _spYear = 2026;
 function renderSpecialTab(){
   const all = loadSpecial();
   document.getElementById('special-year-label').textContent = `${_spYear}年`;
+  const _spCnt = all.filter(r=>r.year===_spYear).length;
+  const _spDelBtn = document.getElementById('special-delete-btn');
+  if(_spDelBtn){
+    _spDelBtn.style.opacity = _spCnt===0 ? '0.35' : '1';
+    _spDelBtn.style.pointerEvents = _spCnt===0 ? 'none' : 'auto';
+    _spDelBtn.title = _spCnt===0 ? 'データがありません' : `${_spYear}年の${_spCnt}件を一括削除`;
+  }
 
   const rows = all.filter(r=>r.year===_spYear).sort((a,b)=>(a.mmdd||'99-99').localeCompare(b.mmdd||'99-99'));
   const tbody = document.getElementById('special-tbody');
@@ -1474,6 +1511,25 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function specialYearMove(dir){
   // データにない年でも ±1 で移動できるよう上限なし
   _spYear += dir;
+  renderSpecialTab();
+}
+function openSpecialYearDeleteConfirm(){
+  const all = loadSpecial();
+  const cnt = all.filter(r=>r.year===_spYear).length;
+  if(cnt===0){showToast('削除対象がありません');return;}
+  document.getElementById('special-year-delete-confirm-year').textContent = _spYear;
+  document.getElementById('special-year-delete-confirm-count').textContent = cnt;
+  document.getElementById('special-year-delete-confirm-modal').style.display = 'flex';
+}
+function closeSpecialYearDeleteConfirm(){
+  document.getElementById('special-year-delete-confirm-modal').style.display = 'none';
+}
+function execSpecialYearDelete(){
+  const all = loadSpecial();
+  const cnt = all.filter(r=>r.year===_spYear).length;
+  saveSpecial(all.filter(r=>r.year!==_spYear));
+  closeSpecialYearDeleteConfirm();
+  showToast(`🗑 ${_spYear}年の${cnt}件を削除しました`);
   renderSpecialTab();
 }
 
@@ -2078,8 +2134,16 @@ function deletePeriodicFromModal(){
 function getAvailableYears(){return[...new Set(entries.map(e=>new Date(e.date).getFullYear()))].sort((a,b)=>b-a)}
 function renderYearly(){
   const years=getAvailableYears();
-  if(!years.includes(selectedYear))selectedYear=years[0]||new Date().getFullYear();
-  document.getElementById('year-selector').innerHTML=years.map(y=>`<button class="year-btn ${y===selectedYear?'active':''}" onclick="selectYear(${y})">${y}年</button>`).join('');
+  if(!years.length&&!selectedYear)selectedYear=new Date().getFullYear();
+  document.getElementById('yearly-year-label').textContent = `${selectedYear}年`;
+  const delBtn=document.getElementById('yearly-delete-btn');
+  if(delBtn){
+    const cnt=entries.filter(e=>new Date(e.date).getFullYear()===selectedYear).length;
+    delBtn.disabled=cnt===0;
+    delBtn.style.opacity=cnt===0?'0.35':'1';
+    delBtn.style.pointerEvents=cnt===0?'none':'auto';
+    delBtn.title=cnt===0?'データがありません':`${selectedYear}年の${cnt}件を一括削除`;
+  }
   const ye=entries.filter(e=>new Date(e.date).getFullYear()===selectedYear);
   const pm={};
   ye.forEach(e=>{if(!pm[e.payee])pm[e.payee]={total:0,count:0};pm[e.payee].total+=Number(e.amount||0);pm[e.payee].count++;});
@@ -2104,6 +2168,29 @@ function renderYearly(){
   document.getElementById('yearly-memo').value=yearlyMemos[selectedYear]||'';
 }
 function selectYear(y){selectedYear=y;renderYearly()}
+function yearlyYearMove(dir){
+  selectedYear+=dir;
+  renderYearly();
+}
+function openYearlyDeleteConfirm(){
+  const cnt=entries.filter(e=>new Date(e.date).getFullYear()===selectedYear).length;
+  if(cnt===0){showToast('削除対象がありません');return;}
+  document.getElementById('yearly-delete-confirm-year').textContent=selectedYear;
+  document.getElementById('yearly-delete-confirm-count').textContent=cnt;
+  document.getElementById('yearly-delete-confirm-modal').style.display='flex';
+}
+function closeYearlyDeleteConfirm(){
+  document.getElementById('yearly-delete-confirm-modal').style.display='none';
+}
+function execYearlyDelete(){
+  const cnt=entries.filter(e=>new Date(e.date).getFullYear()===selectedYear).length;
+  entries=entries.filter(e=>new Date(e.date).getFullYear()!==selectedYear);
+  delete yearlyMemos[selectedYear];
+  sv(SK.entries,entries);sv(SK.memos,yearlyMemos);
+  closeYearlyDeleteConfirm();
+  showToast(`🗑 ${selectedYear}年の${cnt}件を削除しました`);
+  renderYearly();
+}
 function saveYearlyMemo(){yearlyMemos[selectedYear]=document.getElementById('yearly-memo').value;sv(SK.memos,yearlyMemos);showToast('✓ メモを保存しました')}
 
 // ── EXPORT / IMPORT ──
@@ -2285,6 +2372,32 @@ function installPWA(){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <button onclick="closeSpDeleteConfirm()" style="padding:11px;border-radius:12px;background:#e8ddd0;border:none;font-size:14px;font-weight:600;color:#5a4030;cursor:pointer">キャンセル</button>
       <button onclick="execSpecialDelete()" style="padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#e8603a 0%,#d44a20 100%);color:#fff;font-size:14px;font-weight:700;cursor:pointer">削除する</button>
+    </div>
+  </div>
+</div>
+
+<!-- 年間一括削除 確認モーダル -->
+<div id="yearly-delete-confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(80,50,30,.5);z-index:700;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
+  <div style="background:linear-gradient(160deg,#fdf6ec 0%,#f7ede0 100%);border-radius:18px;padding:24px 20px 20px;width:calc(100% - 60px);max-width:300px;box-shadow:0 12px 50px rgba(80,40,20,.3);border:1px solid rgba(200,160,120,.25);animation:fadeScaleIn .18s ease;text-align:center">
+    <div style="font-size:32px;margin-bottom:10px">⚠️</div>
+    <div style="font-size:16px;font-weight:700;color:var(--danger);margin-bottom:10px"><span id="yearly-delete-confirm-year"></span>年分を一括削除</div>
+    <div style="font-size:13px;color:#8a6a4a;margin-bottom:6px;line-height:1.6"><span id="yearly-delete-confirm-count"></span>件のデータをすべて削除します。<br>年間メモも削除されます。<br><strong style="color:var(--danger)">この操作は元に戻せません。</strong></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px">
+      <button onclick="closeYearlyDeleteConfirm()" style="padding:11px;border-radius:12px;background:#e8ddd0;border:none;font-size:14px;font-weight:600;color:#5a4030;cursor:pointer">キャンセル</button>
+      <button onclick="execYearlyDelete()" style="padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#e8603a 0%,#d44a20 100%);color:#fff;font-size:14px;font-weight:700;cursor:pointer">削除する</button>
+    </div>
+  </div>
+</div>
+
+<!-- 特別支払い 年間一括削除 確認モーダル -->
+<div id="special-year-delete-confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(80,50,30,.5);z-index:700;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
+  <div style="background:linear-gradient(160deg,#fdf6ec 0%,#f7ede0 100%);border-radius:18px;padding:24px 20px 20px;width:calc(100% - 60px);max-width:300px;box-shadow:0 12px 50px rgba(80,40,20,.3);border:1px solid rgba(200,160,120,.25);animation:fadeScaleIn .18s ease;text-align:center">
+    <div style="font-size:32px;margin-bottom:10px">⚠️</div>
+    <div style="font-size:16px;font-weight:700;color:var(--danger);margin-bottom:10px"><span id="special-year-delete-confirm-year"></span>年分を一括削除</div>
+    <div style="font-size:13px;color:#8a6a4a;margin-bottom:6px;line-height:1.7"><span id="special-year-delete-confirm-count"></span>件のデータをすべて削除します。<br><strong style="color:var(--danger)">この操作は元に戻せません。</strong></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px">
+      <button onclick="closeSpecialYearDeleteConfirm()" style="padding:11px;border-radius:12px;background:#e8ddd0;border:none;font-size:14px;font-weight:600;color:#5a4030;cursor:pointer">キャンセル</button>
+      <button onclick="execSpecialYearDelete()" style="padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#e8603a 0%,#d44a20 100%);color:#fff;font-size:14px;font-weight:700;cursor:pointer">削除する</button>
     </div>
   </div>
 </div>

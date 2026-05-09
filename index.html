@@ -2255,9 +2255,15 @@ function handleImport(e){
 if('serviceWorker' in navigator){
   // 既存のService Workerを全て登録解除してキャッシュをクリア
   navigator.serviceWorker.getRegistrations().then(regs=>{
-    regs.forEach(r=>r.unregister());
+    if(regs.length>0){
+      Promise.all(regs.map(r=>r.unregister())).then(()=>{
+        caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).then(()=>{
+          // SW解除後にリロードして黒画面を解消
+          location.reload();
+        });
+      });
+    }
   });
-  caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
 }
 
 // ── PWA INSTALL (Android Chrome) ──

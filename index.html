@@ -2253,42 +2253,11 @@ function handleImport(e){
 
 // ── PWA SERVICE WORKER ──
 if('serviceWorker' in navigator){
-  const swCode=`
-const CACHE='tsukibarai-kanri-v1';
-self.addEventListener('install',e=>{
-  e.waitUntil(
-    caches.open(CACHE).then(c=>c.addAll([location.pathname||'/']))
-  );
-  self.skipWaiting();
-});
-self.addEventListener('activate',e=>{
-  e.waitUntil(
-    caches.keys().then(ks=>Promise.all(
-      ks.filter(k=>k!==CACHE).map(k=>caches.delete(k))
-    ))
-  );
-  self.clients.claim();
-});
-self.addEventListener('fetch',e=>{
-  if(e.request.method!=='GET') return;
-  e.respondWith(
-    caches.match(e.request).then(r=>{
-      if(r)return r;
-      return fetch(e.request).then(res=>{
-        if(!res||res.status!==200||res.type==='opaque') return res;
-        const rc=res.clone();
-        caches.open(CACHE).then(c=>c.put(e.request,rc));
-        return res;
-      }).catch(()=>caches.match(e.request));
-    })
-  );
-});
-  `;
-  try{
-    const blob=new Blob([swCode],{type:'application/javascript'});
-    const swUrl=URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl,{scope:'./'}).catch(()=>{});
-  }catch(e){}
+  // 既存のService Workerを全て登録解除してキャッシュをクリア
+  navigator.serviceWorker.getRegistrations().then(regs=>{
+    regs.forEach(r=>r.unregister());
+  });
+  caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
 }
 
 // ── PWA INSTALL (Android Chrome) ──

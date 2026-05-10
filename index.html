@@ -441,7 +441,7 @@ tr:last-child td{border-bottom:none}
 /* ── PRINT ── */
 @media print{
   /* ─ 基本リセット ─ */
-  #app-header,#tab-bar,#tenkey-modal,.modal-overlay,.no-print{display:none!important}
+  #app-header,#tab-bar,#tenkey-modal,.modal-overlay,.no-print,#month-nav-bar,#btn-today-month{display:none!important}
   body{background:#fff!important;font-size:16px!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #main{position:static!important;overflow:visible!important;top:0!important;bottom:0!important}
   .tab-content{display:none!important}
@@ -606,7 +606,7 @@ tr:last-child td{border-bottom:none}
 <!-- MONTH NAV BAR -->
 <div id="month-nav-bar">
   <div id="month-nav-inner">
-    <button class="hbtn no-print" onclick="window.print()" style="position:fixed;top:57px;left:8px;z-index:100;color:#fdf0e0;font-size:13px;padding:4px 12px;min-width:unset;gap:0;flex-direction:row;height:30px;font-family:inherit">🖨️ 印刷</button>
+    <button class="hbtn no-print" onclick="window.print()" style="display:none;position:fixed;top:57px;left:8px;z-index:100;color:#fdf0e0;font-size:13px;padding:4px 12px;min-width:unset;gap:0;flex-direction:row;height:30px;font-family:inherit">🖨️ 印刷</button>
     <button class="hbtn sp-year-nav-btn" style="color:#fdf0e0" onclick="changeReportMonth(-1)">◀</button>
     <span id="header-month" style="color:#8b5a2b;font-size:17px;font-weight:700;white-space:nowrap;text-align:center;text-shadow:0 1px 2px rgba(255,220,180,.3)"></span>
     <button class="hbtn sp-year-nav-btn" style="color:#fdf0e0" onclick="changeReportMonth(1)">▶</button>
@@ -1747,6 +1747,9 @@ function switchTab(tab){
   document.getElementById('main').style.top = showMonthNav?'90px':'54px';
   if(!showMonthNav) todayBtn.style.visibility='hidden';
   else _updateTodayMonthBtn();
+  // 印刷ボタンは月次タブのみ表示
+  const printBtn = document.querySelector('#month-nav-bar .no-print');
+  if(printBtn) printBtn.style.display = tab==='report'?'':'none';
   if(tab==='input')renderInputTab();
   if(tab==='report')renderReport();
   if(tab==='settings')renderSettings();

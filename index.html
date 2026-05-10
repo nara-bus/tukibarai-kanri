@@ -2241,6 +2241,11 @@ function handleImport(e){
   reader.readAsText(file,'UTF-8');
 }
 
+// ── 古いServiceWorkerを解除 ──
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister()));
+}
+
 // ── PWA SERVICE WORKER ──
 if('serviceWorker' in navigator){
   const swCode=`

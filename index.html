@@ -76,7 +76,7 @@ body{
 }
 #month-nav-bar{
   position:fixed;top:54px;left:0;right:0;z-index:99;height:36px;
-  display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:flex-start;justify-content:center;
   pointer-events:none;
 }
 #month-nav-bar > *{pointer-events:auto;}
@@ -334,7 +334,6 @@ tr:last-child td{border-bottom:none}
   display:flex;align-items:center;justify-content:center;
 }
 .month-nav-btn:active{background:rgba(253,240,220,.35)}
-#btn-monthly-print:active{background:rgba(253,240,220,.35)}
 
 /* ── SUMMARY ── */
 .summary-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(200,170,130,.25);font-size:15px}
@@ -442,7 +441,7 @@ tr:last-child td{border-bottom:none}
 /* ── PRINT ── */
 @media print{
   /* ─ 基本リセット ─ */
-  #app-header,#tab-bar,#tenkey-modal,.modal-overlay,.no-print,#month-nav-bar,#btn-today-month{display:none!important}
+  #app-header,#tab-bar,#tenkey-modal,.modal-overlay,.no-print{display:none!important}
   body{background:#fff!important;font-size:16px!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #main{position:static!important;overflow:visible!important;top:0!important;bottom:0!important}
   .tab-content{display:none!important}
@@ -606,14 +605,6 @@ tr:last-child td{border-bottom:none}
 
 <!-- MONTH NAV BAR -->
 <div id="month-nav-bar">
-  <button id="btn-monthly-print" class="hbtn sp-year-nav-btn no-print" onclick="window.print()" title="印刷する"
-    style="position:absolute;left:8px;color:#fdf0e0;display:none;">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-      <polyline points="6 9 6 2 18 2 18 9"/>
-      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-      <rect x="6" y="14" width="12" height="8"/>
-    </svg>
-  </button>
   <div id="month-nav-inner">
     <button class="hbtn sp-year-nav-btn" style="color:#fdf0e0" onclick="changeReportMonth(-1)">◀</button>
     <span id="header-month" style="color:#8b5a2b;font-size:17px;font-weight:700;white-space:nowrap;text-align:center;text-shadow:0 1px 2px rgba(255,220,180,.3)"></span>
@@ -677,6 +668,7 @@ tr:last-child td{border-bottom:none}
       <div class="card-header">💰 集計</div>
       <div class="card-body" id="report-summary"></div>
     </div>
+    <button class="btn btn-outline btn-block no-print" onclick="window.print()" style="margin-bottom:8px">🖨️ 印刷する</button>
   </div>
 
   <!-- TAB: 設定 -->
@@ -1751,9 +1743,7 @@ function switchTab(tab){
   const showMonthNav = tab==='input'||tab==='report';
   const navBar = document.getElementById('month-nav-bar');
   const todayBtn = document.getElementById('btn-today-month');
-  const printBtn = document.getElementById('btn-monthly-print');
   navBar.style.display = showMonthNav?'flex':'none';
-  if(printBtn) printBtn.style.display = tab==='report'?'inline-flex':'none';
   document.getElementById('main').style.top = showMonthNav?'90px':'54px';
   if(!showMonthNav) todayBtn.style.visibility='hidden';
   else _updateTodayMonthBtn();

@@ -2307,45 +2307,7 @@ function handleImport(e){
   reader.readAsText(file,'UTF-8');
 }
 
-// ── PWA SERVICE WORKER ──
-if('serviceWorker' in navigator){
-  const swCode=`
-const CACHE='tsukibarai-kanri-v1-'+new Date().toISOString().slice(0,10).replace(/-/g,'');
-self.addEventListener('install',e=>{
-  e.waitUntil(
-    caches.open(CACHE).then(c=>c.addAll([location.pathname||'/']))
-  );
-  self.skipWaiting();
-});
-self.addEventListener('activate',e=>{
-  e.waitUntil(
-    caches.keys().then(ks=>Promise.all(
-      ks.filter(k=>k!==CACHE).map(k=>caches.delete(k))
-    ))
-  );
-  self.clients.claim();
-});
-self.addEventListener('fetch',e=>{
-  if(e.request.method!=='GET') return;
-  e.respondWith(
-    caches.match(e.request).then(r=>{
-      if(r)return r;
-      return fetch(e.request).then(res=>{
-        if(!res||res.status!==200||res.type==='opaque') return res;
-        const rc=res.clone();
-        caches.open(CACHE).then(c=>c.put(e.request,rc));
-        return res;
-      }).catch(()=>caches.match(e.request));
-    })
-  );
-});
-  `;
-  try{
-    const blob=new Blob([swCode],{type:'application/javascript'});
-    const swUrl=URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl,{scope:'./'}).catch(()=>{});
-  }catch(e){}
-}
+
 
 // ── PWA INSTALL (Android Chrome) ──
 let _installPrompt=null;

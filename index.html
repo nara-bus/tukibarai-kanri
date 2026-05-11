@@ -563,6 +563,27 @@ tr:last-child td{border-bottom:none}
 .print-only{display:none}
 .tkey-wide{grid-column:span 1}
 
+/* ── 月次テーブル 画面表示時の列幅 ── */
+@media not print {
+  #tab-report col.col-date    { width: 42px }   /* 月日：最小 */
+  #tab-report col.col-payee   { width: 18% }
+  #tab-report col.col-purpose { width: auto }    /* 用途：余白をすべて使う */
+  #tab-report col.col-amount  { width: 80px }    /* 金額：適度に縮小 */
+  #tab-report col.col-billing { width: 38px }    /* 請求：最小 */
+  #tab-report col.col-note    { width: 15% }
+  #tab-report col.no-print    { width: 34px }    /* 編集：最小 */
+  /* 月日・請求・編集セル：折り返しなし・中央 */
+  #tab-report .td-date        { font-size: 12px }
+  #tab-report th:first-child,
+  #tab-report td:first-child  { padding-left: 5px; padding-right: 3px }
+  #tab-report th:nth-child(5), /* 請求 */
+  #tab-report td:nth-child(5) { text-align: center; padding-left: 2px; padding-right: 2px }
+  #tab-report th:last-child,   /* 編集 */
+  #tab-report td:last-child   { text-align: center; padding-left: 2px; padding-right: 2px }
+  #tab-report th:nth-child(4), /* 金額 */
+  #tab-report td:nth-child(4) { padding-left: 4px; padding-right: 4px }
+}
+
 /* ── ユーティリティ（インラインスタイル削減） ── */
 .sp-year-nav-btn{
   background:#a07f6a;color:#fdf0e0;

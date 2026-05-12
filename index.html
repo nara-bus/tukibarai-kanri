@@ -1871,8 +1871,15 @@ function openSpecialEditModal(id){
   const dateVal = row.year && row.mmdd ? `${row.year}-${row.mmdd}` : '';
   document.getElementById('sp2-date-val').value = dateVal;
   const el = document.getElementById('sp2-date-display-text');
-  if(dateVal){ el.textContent = dateVal; el.classList.remove('placeholder'); }
-  else { el.textContent = '例：2026-01-27'; el.classList.add('placeholder'); }
+  if(dateVal){
+    const dp = parseDateLocal(dateVal);
+    el.textContent = dp
+      ? `${dp.y}/${String(dp.m).padStart(2,'0')}/${String(dp.d).padStart(2,'0')}`
+      : dateVal;
+    el.classList.remove('placeholder');
+  } else {
+    el.textContent = '例：2026-01-27'; el.classList.add('placeholder');
+  }
   _spModalMode(true);
   document.getElementById('special-add-modal').classList.add('open');
 }
@@ -1906,7 +1913,7 @@ function saveSpecialRow(){
   const purpose = document.getElementById('sp2-purpose').value.trim();
   const amount  = document.getElementById('sp2-amount').value.replace(/[^\d]/g,'');
   const method  = document.getElementById('sp2-method').value.trim();
-  if(!payee){alert('支払先を入力してください');return;}
+  if(!payee){showToast('⚠ 支払先を入力してください');return;}
   let data = loadSpecial();
   if(editId){
     data = data.map(r=>r.id===editId ? {...r,year,mmdd,payee,purpose,amount,method} : r);
@@ -2023,7 +2030,9 @@ function renderQuickSummary(){
   `;
 }
 function renderPeriodicSuggestion(){
-  const y=reportYear,m=reportMonth;
+  // 入力タブの定期提案は「今月」固定（レポートの選択月に引きずられないよう分離）
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth()+1;
   const defaultDate=`${y}-${String(m).padStart(2,'0')}-01`;
   const due=periodics.filter(p=>isPeriodicDue(p,y,m));
   const el=document.getElementById('periodic-suggestion');
@@ -2094,9 +2103,11 @@ function addPeriodicEntry(pid,dateVal){
       const newLast=((last-1+step)%12)+1;
       purpose=lastPurpose.replace(/(\d+)月([、・,\s]*)(\d+)月分/,`${newFirst}月${sep}${newLast}月分`);
     }else if(singleM){
-      const addDate=new Date(date);
-      const lastDate=new Date(samePayee[0].date);
-      const monthDiff=(addDate.getFullYear()-lastDate.getFullYear())*12+(addDate.getMonth()-lastDate.getMonth());
+      const addP  = parseDateLocal(date);
+      const lastP = parseDateLocal(samePayee[0].date);
+      const monthDiff = addP && lastP
+        ? (addP.y - lastP.y) * 12 + (addP.m - lastP.m)
+        : 0;
       const lastMonth=parseInt(singleM[1],10);
       let newMonth=lastMonth+Math.max(1,monthDiff);
       newMonth=((newMonth-1)%12)+1;

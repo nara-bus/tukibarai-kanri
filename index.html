@@ -274,7 +274,7 @@ textarea{resize:vertical;min-height:56px}
 .io-action-row{display:flex;gap:10px;margin-top:4px}
 
 /* ── TABLE ── */
-.tbl-wrap{overflow-x:auto}
+.tbl-wrap{overflow-x:hidden}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th{background:linear-gradient(135deg,var(--warm1) 0%,#ddc8a8 100%);color:var(--primary);padding:8px 7px;text-align:left;font-size:12px;letter-spacing:.05em;white-space:nowrap;font-weight:700}
 td{padding:8px 7px;border-bottom:1px solid rgba(200,170,130,.2);vertical-align:middle}
@@ -283,7 +283,7 @@ tr:last-child td{border-bottom:none}
 .amount{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .amount.negative{color:var(--danger)}
 .td-date{white-space:nowrap;font-size:13px;color:var(--text-sub)}
-.td-payee{font-weight:600}
+.td-payee{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .td-note{font-size:12px;color:var(--text-sub);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .icon-btn{background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:var(--text-sub);font-size:17px}
 
@@ -533,13 +533,15 @@ tr:last-child td{border-bottom:none}
 
 /* ── 月次テーブル 画面表示時の列幅 ── */
 @media not print {
-  #tab-report col.col-date    { width: 42px }   /* 月日：最小 */
-  #tab-report col.col-payee   { width: 18% }
-  #tab-report col.col-purpose { width: auto }    /* 用途：余白をすべて使う */
-  #tab-report col.col-amount  { width: 80px }    /* 金額：適度に縮小 */
-  #tab-report col.col-billing { width: 38px }    /* 請求：最小 */
-  #tab-report col.col-note    { width: 15% }
-  #tab-report col.no-print    { width: 34px }    /* 編集：最小 */
+  #tab-report table           { table-layout:fixed;width:100% }
+  #tab-report col.col-date    { width: 8% }      /* 月日 */
+  #tab-report col.col-payee   { width: 17% }     /* 支払先 */
+  #tab-report col.col-purpose { width: 26% }     /* 用途 */
+  #tab-report .col-purpose    { overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
+  #tab-report col.col-amount  { width: 17% }     /* 金額 */
+  #tab-report col.col-billing { width: 10% }     /* 請求 */
+  #tab-report col.col-note    { width: 13% }     /* 備考 */
+  #tab-report col.no-print    { width: 9% }      /* 編集 */
   /* 月日・請求・編集セル：折り返しなし・中央 */
   #tab-report .td-date        { font-size: 12px }
   #tab-report th:first-child,

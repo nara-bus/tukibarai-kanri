@@ -573,7 +573,13 @@ tr:last-child td{border-bottom:none}
 .sp-copy-btn{
   background:rgba(160,120,80,.15);color:var(--accent);
   border:1.5px solid rgba(160,120,80,.3);border-radius:10px;
-  padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;
+  width:32px;height:32px;font-size:16px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;padding:0;
+}
+.sp-copy-btn svg{width:18px;height:18px;}
+.sp-paste-btn{
+  background:rgba(70,130,90,.15);color:#3d7a4d;
+  border:1.5px solid rgba(70,130,90,.3);
 }
 /* 年間・特別タブの削除ボタン */
 .btn-delete-year{
@@ -778,8 +784,9 @@ tr:last-child td{border-bottom:none}
       <div class="card-body">
         <!-- 年ナビ + 追加ボタン -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div style="flex:1">
-            <button onclick="copyPrevYear()" class="sp-copy-btn">前年全コピー</button>
+          <div style="flex:1;display:flex;gap:6px">
+            <button onclick="copySpecialYear()" class="sp-copy-btn" title="この年のデータを全コピー"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+            <button onclick="pasteSpecialYear()" class="sp-copy-btn sp-paste-btn" title="コピーしたデータを貼付"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0S9.6.84 9.18 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"/></svg></button>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
             <button class="hbtn sp-year-nav-btn" onclick="specialYearMove(-1)">◀</button>
@@ -1653,28 +1660,45 @@ function openSpecialYearDeleteConfirm(){
   });
 }
 
-// 前年全コピー
-function copyPrevYear(){
-  const prevYear = _spYear - 1;
+// 全コピー／貼付（年またぎ）
+const SK_SP_CLIP = 'tsukiharai_special_clipboard';
+
+function copySpecialYear(){
   const all = loadSpecial();
-  const prevRows = all.filter(r=>r.year===prevYear);
-  if(prevRows.length===0){showToast(`${prevYear}年のデータがありません`);return;}
-  const doCopy = ()=>{
+  const rows = all.filter(r=>r.year===_spYear);
+  if(rows.length===0){showToast(`${_spYear}年のデータがありません`);return;}
+  localStorage.setItem(SK_SP_CLIP, JSON.stringify({year:_spYear, rows}));
+  showToast(`✓ ${_spYear}年のデータ（${rows.length}件）をコピーしました`);
+}
+
+function pasteSpecialYear(){
+  let clip = null;
+  try{ clip = JSON.parse(localStorage.getItem(SK_SP_CLIP)||'null'); }catch(e){ clip = null; }
+  if(!clip || !Array.isArray(clip.rows) || clip.rows.length===0){
+    showToast('コピーされたデータがありません');
+    return;
+  }
+  if(clip.year === _spYear){
+    showToast('コピー元と同じ年には貼付できません');
+    return;
+  }
+  const doPaste = ()=>{
     const latest = loadSpecial();
-    const copies = prevRows.map(r=>({
+    const copies = clip.rows.map(r=>({
       ...r,
       id: Date.now().toString(36)+Math.random().toString(36).slice(2,5),
       year: _spYear
     }));
     saveSpecial([...latest, ...copies]);
     renderSpecialTab();
-    showToast(`✓ ${prevYear}年→${_spYear}年へ${copies.length}件追加しました`);
+    showToast(`✓ ${clip.year}年→${_spYear}年へ${copies.length}件貼付けしました`);
   };
+  const all = loadSpecial();
   const hasData = all.some(r=>r.year===_spYear);
   const msg = hasData
-    ? `${_spYear}年にすでにデータがあります。前年（${prevYear}年）分を追加コピーしますか？`
-    : `${prevYear}年のデータ（${prevRows.length}件）を${_spYear}年にコピーしますか？`;
-  openConfirmModal(msg, doCopy);
+    ? `${_spYear}年にすでにデータがあります。${clip.year}年分（${clip.rows.length}件）を追加貼付けしますか？`
+    : `${clip.year}年のデータ（${clip.rows.length}件）を${_spYear}年に貼付けしますか？`;
+  openConfirmModal(msg, doPaste);
 }
 
 // ── 特別 金額テンキー ──

@@ -4,7 +4,7 @@
   "description": "月次支払い管理アプリ",
   "start_url": "./index.html",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#f0ebe0",
   "theme_color": "#b89880",
   "lang": "ja",

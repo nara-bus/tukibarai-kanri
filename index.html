@@ -554,6 +554,19 @@ tr:last-child td{border-bottom:none}
   #tab-report td:nth-child(4) { padding-left: 4px; padding-right: 4px }
 }
 
+/* ── 横画面：月日・金額列が無駄に広くなるので縮めて、支払先・用途・備考に配分 ── */
+@media (orientation: landscape) {
+  #tab-report col.col-date    { width: 4% !important }   /* 月日 8%→4% */
+  #tab-report col.col-payee   { width: 20% !important }  /* 支払先 17%→20% */
+  #tab-report col.col-purpose { width: 28% !important }  /* 用途 26%→28% */
+  #tab-report col.col-amount  { width: 10% !important }  /* 金額 17%→10%（少し余裕を残す） */
+  #tab-report col.col-note    { width: 19% !important }  /* 備考 13%→19% */
+
+  /* 特別タブ：列幅指定がないので、月日を必要最小限に縮めて残りを他列に自動配分 */
+  #special-table th:first-child,
+  #special-table td:first-child { width:1%; white-space:nowrap }
+}
+
 /* ── ユーティリティ（インラインスタイル削減） ── */
 .sp-year-nav-btn{
   background:#a07f6a;color:#fdf0e0;
@@ -808,7 +821,7 @@ tr:last-child td{border-bottom:none}
               <th style="white-space:nowrap">月日</th>
               <th>支払先</th>
               <th>用途</th>
-              <th style="text-align:left">金額</th>
+              <th style="text-align:right;padding-right:14px">金額</th>
               <th>方法</th>
               <th style="width:40px;text-align:center">編集</th>
             </tr></thead>
@@ -1627,7 +1640,7 @@ function renderSpecialTab(){
       <td style="${dateStyle}">${formatSpecialDate(r.mmdd)}${badge}</td>
       <td style="font-size:12px">${esc(r.payee)}</td>
       <td style="font-size:11px;color:#7a5c3a">${esc(r.purpose)}</td>
-      <td style="font-size:12px;white-space:nowrap">${r.amount?'¥'+Number(r.amount).toLocaleString():'-'}</td>
+      <td style="font-size:12px;white-space:nowrap;text-align:right;padding-right:14px">${r.amount?'¥'+Number(r.amount).toLocaleString():'-'}</td>
       <td style="font-size:11px;color:#7a5c3a">${esc(r.method)}</td>
       <td style="text-align:center">
         <button onclick="openSpecialEditModal('${r.id}')" style="background:none;border:none;cursor:pointer;font-size:16px;padding:1px 2px" title="編集">✏️</button>

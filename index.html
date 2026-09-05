@@ -2513,6 +2513,16 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js')
     .then(() => console.log('SW registered'))
     .catch(err => console.warn('SW registration failed:', err));
+
+  // 新しいsw.jsが有効になった瞬間に自動で再読み込みする。
+  // これがないと、skipWaiting/clients.claimで裏側は新しくなっても、
+  // 開きっぱなしの画面自体は古いままになり、アプリを完全に閉じるまで更新が反映されなかった。
+  let swRefreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (swRefreshing) return;
+    swRefreshing = true;
+    window.location.reload();
+  });
 }
 </script>
 </body>
